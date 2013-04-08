@@ -48,20 +48,18 @@ right   (character={ctrl+f}|
 
 # python extensions might be things like "change comments| sentence | word | paragraph".  
 
+
+#
 ### Toggle name commands
 toggle name = {ctrl+q}{ctrl+a}
               {ctrl+a}{ctrl+@}{ctrl+e}{ctrl+w} 
               Wait(0)
               toggle.name() 
-	      {ctrl+y};
+			  {ctrl+y};
+			  #we should keep the cursor ^A \x01 in the clip,
+			  #find it, delete it,
+			  #end, leave cursor there 
 	      # CLIPSAVE()/CLIPRESTORE();
-
-match name = CLIPSAVE() 
-              {ctrl+a}{ctrl+@}{ctrl+e}{ctrl+w} 
-              Wait(0)
-              match.name() 
-	      {ctrl+y};
-	      # CLIPRESTORE();
 ### 
 
 # add argument = 

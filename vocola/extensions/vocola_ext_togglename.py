@@ -73,9 +73,12 @@ class winclip:
                 result=self.win32clipboard.GetClipboardData(self.win32con.CF_TEXT)
 
             self.win32clipboard.CloseClipboard()
+            #find cursor possition 
             null = string.find(result, chr(0))
-            if null >0:
+            if null >=0:
                 result = result[0:null]
+            else:
+				logging.error("null not found in clipboard get")
             return result
 
         def clipboard_set(self,aString):
@@ -123,54 +126,10 @@ def vc_toggle_name():
 
     return ""
 
-# Vocola function: match.name
-def vc_match_name():
-    logging.debug("VMN start")
-    try:
-        tni = tn()
-        result = tni.clip_instance.clipboard_get()
-        logging.debug( "clip result = |%s|" % result)
-        if result:
-            (left_code, code_name, right_code) = tni.match_name(result)
-            tni.clip_instance.clipboard_set(left_code+code_name+right_code)
-    except Exception, error:
-        logging.debug( "VMN %s" %(repr(error)))
-        traceback_string = traceback.format_exc()
-        logging.debug( "VMN TB %s" % traceback_string)
-
-    return ""
 
 
-def stdio_toggle_name():
-    logging.debug("STN start 0")
-    try:
-        tni = tn()
-        logging.debug("STN start 1")
-        string = sys.stdin.read()
-        (left_code, code_name, right_code) = tni.toggle_name(string)
-        # place back in the clipboard
-        #logging.debug( "result = |%s|" % plain_name
-        sys.stdio.write( left_code+code_name+right_code)
-        logging.debug("STN start 2 %s" %repr(ignore_data))
-    except Exception, error:
-        logging.debug( "STN %s" %(repr(error)))
 
-    return ""
-
-#
-def stdio_match_name():
-    logging.debug("SMN start")
-    try:
-        logging.debug( "SMN stdio result = |%s|" % result)
-        tni = tn()
-        string = sys.stdin.read()
-        ignore_data = tni.match_name(string)
-        sys.stdio.write(left_code + code_name + right_code)
-    except Exception, error:
-        logging.debug( "SMN %s" %(repr(error)))
-
-    return ""
-
+### Old tests need to be updated to inlude toggle_tests.py
 def tests():
     
     #Unit test is kind of weird. Put test data into the clipboard then
