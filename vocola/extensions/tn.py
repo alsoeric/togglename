@@ -368,35 +368,6 @@ class ToggleName():
         if name_string == "" or " " not in name_string:
             return None
         
-        ### OLD ### Didn't work well with cursor
-        #~ length = 0
-        #~ true_string_name = False
-        #~ if self.remainingdata[0].isdigit():
-            #~ return None
-        #~ for char in self.remainingdata:
-            #~ if char == "\x01":
-                #~ length += 1
-                #~ continue
-            #~ #space dectect
-            #~ elif char == " ":
-                #~ #if the next char is not alunum or is a keyword
-                #~ #it marks the end of string_word
-                #~ #except in the case where the curser is after a space
-                #~ if (key_word(self.remainingdata[length+1:])
-                    #~ or not self.remainingdata[length+1].isalnum()
-                    #~ and self.remainingdata[length+1] != "\x01"):
-                        #~ break
-                #~ else:
-                    #~ true_string_name = True
-            #~ elif not char.isalnum():
-                #~ break
-            #~ length += 1
-        #~ 
-        #~ if length == 0 or not true_string_name:
-            #~ return None
-        ###
-        
-        
         name_len = len(name_string)
         #bang bang lookup
         bb = self.q_bang_name(name_len)
@@ -412,14 +383,24 @@ class ToggleName():
 
         
 class component_Parent():
-    def __init__(self, data):   
+    def __init__(self, data, had_cursor = False):
+        if had_cursor == True:
+            self.had_cursor = True
+        elif "\x01" in data:
+            self.had_cursor = True
+            data = data.replace("\x01","")
+        else:
+            self.had_cursor = False
         self.data = data
     def present(self):
-        """Returns string form of data"""
-        return self.data.replace("\x01", "")
-    
+        """Returns string form of data
+        it cursor was in data, adds cursor to the of string"""
+        if self.had_cursor:
+            return self.data + "\x01"
+        return self.data
+        
     def has_cursor(self):
-        return "\x01" in self.data
+        return self.had_cursor
         
 class string_name(component_Parent):
     def convert(self):
@@ -427,12 +408,12 @@ class string_name(component_Parent):
         looks up sql database for partering codename, if none,
         returns bang_name"""
         sql = sqlHandle()
-        val = sql.val_lookup(self.data.replace("\x01", ""))
+        val = sql.val_lookup(self.data)
         
         if val == None:
-            return bang_name(self.data+"!!unknown")
+            return bang_name(self.data+"!!unknown", had_cursor = self.had_cursor)
         else:
-            return code_name(val)
+            return code_name(val, had_cursor = self.had_cursor)
         
     
 class code_name(component_Parent):
@@ -447,9 +428,9 @@ class code_name(component_Parent):
         sql = sqlHandle()
         string_n  = sql.key_lookup(self.data.replace("\x01", ""))
         if string_n == None:
-            return bang_name("unknown!!" + self.data)
+            return bang_name("unknown!!" + self.data, had_cursor = self.had_cursor)
         else:
-            return string_name(string_n)
+            return string_name(string_n, had_cursor = self.had_cursor)
     
 
 class bang_name(component_Parent):
@@ -459,7 +440,7 @@ class bang_name(component_Parent):
         Otherwise returns a copy of itself."""
         # store data in dictionary hidden inside an SQLlite database
         #What happends in the case of "  !!cod_name" ? should do testing
-        str_name , cod_name = self.data.replace("\x01", "").split("!!")
+        str_name , cod_name = self.data.split("!!")
         
         sql = sqlHandle()
         
@@ -476,7 +457,7 @@ class bang_name(component_Parent):
             
             
         if "unknown" == other_name:
-            return end_type(goal_name) # replace with pass?
+            pass 
         elif "unknown" == goal_name:
             #look up if it has been updated
             goal_name = lookup(other_name)
@@ -485,7 +466,7 @@ class bang_name(component_Parent):
                 
         else:
             conflict = sql.set_match(str_name, cod_name)
-        return end_type(goal_name)
+        return end_type(goal_name, had_cursor = self.had_cursor)
 
         
     
