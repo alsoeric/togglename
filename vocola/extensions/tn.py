@@ -27,8 +27,8 @@ logging.basicConfig(filename='./toggle_name.log',
                     format='%(asctime)s - %(levelname)s - %(message)s')
 console = logging.StreamHandler()
 console.setLevel(logging.DEBUG)
-#logging.getLogger('').addHandler(console)
-logging.debug('------------ start of run ------------------')
+logging.getLogger('').addHandler(console)
+logging.debug('------------ start of tn.py run ------------------')
 
 
 toggle_name_DB = "./togglename.sqlite"
@@ -143,13 +143,19 @@ def key_word(string):
 
 class ToggleName():
 
-    def __init__(self,data, s2c=True, cn=True):
+    def __init__(self,data,
+                 #s2c=True,
+                 #cn=True
+                 ):
         self.data = data
         self.remainingdata = data
         
-        #Bools
-        self.s2c = s2c #string to code
-        self.cn = cn #cursor needed
+        
+        self.component_list = []
+        
+        #~ #Bools
+        #~ self.s2c = s2c #string to code
+        #~ self.cn = cn #cursor needed
     
     def reasemble(self):
         rs = ""
@@ -158,34 +164,61 @@ class ToggleName():
             rs += data
         return rs + self.remainingdata
     
-    def toggle(self):
-        self.component_list = []
+    def toggle(self, s2c= True, cn= True ):
+        """Togglename command
+        s2c = string to code. The direction of toggle. Toggle/flip
+        """
         for token in self.component():
             if (isinstance(token, string_name) and
-                self.cn == token.has_cursor() and 
-                self.s2c == True):
+                cn == token.has_cursor() and 
+                s2c == True):
                 # Early out if cn?
                 token = token.convert()
                 
             elif (isinstance(token, code_name) and
-                self.cn == token.has_cursor() and 
-                self.s2c == False):
+                cn == token.has_cursor() and 
+                s2c == False):
                 
                 token = token.convert()
             
-            elif isinstance(token, bang_name):
-                token = token.matchname(self.s2c)
+            elif (isinstance(token, bang_name) and
+                  cn == token.has_cursor()):
+                token = token.matchname(s2c)
             
             self.component_list.append(token)
-        return self.component_list
+        return 
             
         
+    def fix_unknown(self):
+        """works though data, looking for unfilled bangname, apon finding the first one, replacing unknown with cursor
+        
+        cursor should not be in data,
+        does a look to be sure it is not there
+        """
+        self.remainingdata = self.data.replace("\x01","")
+        
+        for part in self.component():
+            self.component_list.append(part)
+            if isinstance(part, bang_name):
+                if part.fix_unknown():
+                    break
+        else:
+            self.remainingdata += "\x01"
+                    
+        return 
+
+    def get_parsed_data(self):
+        return self.component_list
+    
     def component(self):
         """convert data into indiviual data types"""
         #Doesn't it makes more sence for the s2c and cn requrements apear here?
+                
         test_list = [self.q_not_Name,
-                 self.q_stringname,
-                 self.q_codename,]
+                    self.q_bang_name,
+                    self.q_stringname,
+                    self.q_codename,
+                    ]
 
 
         while self.remainingdata:
@@ -223,9 +256,13 @@ class ToggleName():
         def punk(string):
             """returns the lenght of puncuation at the beggining of str"""
             length = 0
-            for char in string:
+            for index, char in enumerate(string):
                 if char.isalnum() or char in ("_", "\x01", "#", "'", '"', '"""') or char.isspace():
                     break
+                
+                if string[index:].startswith("!!"):
+                    break
+                
                 length += 1
             return length
         
@@ -307,8 +344,12 @@ class ToggleName():
         
         return code_name(data)
         
-    def q_bang_name(self, start_index):
+    def q_bang_name(self, start_index=0):
         """Returns bangobject
+        is used in q_stringname and q_codename
+        also in compontent tests
+
+        looks for !!codename at self.remainingdata[index:]
         start_index = int # place in self.remaining data that is looked at
         """
         if self.remainingdata[start_index:].startswith("!!"):
@@ -321,8 +362,12 @@ class ToggleName():
             
         pre_bang_str = self.remainingdata[:start_index + bang_offset]
         self.remainingdata = self.remainingdata[start_index + bang_offset:]
-        cd_data = self.q_codename().data
+        cd_data = self.q_codename().present()
         return bang_name(pre_bang_str + cd_data)
+    
+    def q_unknown(self):
+        """returns unknown object"""
+        pass
     
     def q_stringname(self):
         
@@ -357,7 +402,8 @@ class ToggleName():
                     #Then remove " "
                     #~ name_string = name_string.rstrip("\x01")
                     #~ name_string = name_string.rstrip(" ")
-                    print("|%s|"%name_string)
+                    
+                    #~ print("|%s|"%name_string)
 
                     
                 break
@@ -442,6 +488,9 @@ class bang_name(component_Parent):
         #What happends in the case of "  !!cod_name" ? should do testing
         str_name , cod_name = self.data.split("!!")
         
+        if "" in (str_name, cod_name):
+            return self
+        
         sql = sqlHandle()
         
         if s2c:
@@ -484,7 +533,30 @@ class bang_name(component_Parent):
                 #~ conflict = sql.set_match(str_name, cod_name)
             #~ return code_name(cod_name)
 
-    
+    def fix_unknown(self):
+        """used with fixname, to input the cursor where the unknown was
+        foo bar!!unknown    -> foo bar!!cursor
+        unknown!!foo        -> cursor!!foo
+        !!unknown           -> cursor
+        
+        returns True if bangname has unknown, and will edit data
+        otherwise returns false
+        """
+        left, right = self.data.split("!!")
+        if "unknown" not in (left, right):
+            return False
+        
+        if right == "unknown":
+            right = "\x01"
+        elif left == "unknown":
+            left = "\x01"
+        
+        if left == "":
+            self.data = right    
+        else:
+            self.data = "!!".join((left,right))
+        
+        return True
 class not_name(component_Parent):
     pass
     
