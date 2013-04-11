@@ -31,7 +31,9 @@ tests = [ ("", cursor),
 		  ("class !!unknown():", "class "+cursor+"():"),
 		  ("foo bar!!unknown", "foo bar!!"+cursor),
 		  ("unknown!!foo", cursor + "!!foo"),
-		  ("unkno"+cursor+"wn!!foo",cursor + "!!foo"),  
+		  ("unkno"+cursor+"wn!!foo",cursor + "!!foo"),
+		  ("class !!unknown(foo bar!!unknown):","class "+cursor +"(foo bar!!unknown):"),
+		    
 		]
 for test, result in tests:
 	
