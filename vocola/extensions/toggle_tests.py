@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-#  untitled.py
+#  toggle_tests.py
 #  
 #  Copyright 2013 Tonis <Tonis@PLUTO>
 #  
@@ -87,6 +87,9 @@ test_set = [
                 ("function(apple pie,)", 1, 0, "function(aplpie,)"),
                 ("function(apple pie,apple pie,apple pie)", 1, 0, "function(aplpie,aplpie,aplpie)"),
                 ("function( apple pie ,)", 1, 0, "function( aplpie ,)"),
+                
+                # "!!unknown or !unknown!
+                ("class !!unknown ()", 1,0, ""),
                 ]
                 
                 
@@ -118,8 +121,8 @@ del(sql)
     
 for test, s2c, cn, result in test_set:
     #~ print("Test: %s"%(test,))
-    tn = ToggleName(test, s2c, cn)
-    ol = tn.toggle()
+    tn = ToggleName(test)
+    ol = tn.toggle(s2c, cn)
     tr = tn.reasemble()
     if tr == result:
         print("Test passed: " + test)
@@ -129,9 +132,10 @@ for test, s2c, cn, result in test_set:
         print("Correct result: |%s|"%result)
         print("Actual result: |%s|"%tr)
         print("----")
-        for i in ol:
+        for i in tn.get_parsed_data():
             print("|%s|"%i.data)
             print(i.__class__.__name__)
             print("----")
         print("")
+
 

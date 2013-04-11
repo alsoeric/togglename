@@ -10,7 +10,7 @@ import logging
 from optparse import OptionParser
 import traceback
 
-logging.basicConfig(filename='C:/Users/esj/Documents/toggle_name/toggle_name.log',
+logging.basicConfig(filename='C:/Users/Tonis/Documents/toggle_name/toggle_name.log',
                     level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 console = logging.StreamHandler()
@@ -45,10 +45,15 @@ def commandline():
         default = "st",
         help="choose c[t|m] for clipboard, s[t|m] for stdin, t = test"
                       )
-    
+                      
+    parser.add_option("-v", "--verbose", action = "store_true",
+                      dest = "verbose", default = False,
+                      help = "Will print out clip and toggle result"
+                      )
+        
     (options, parse_args) = parser.parse_args()
 
-    return (options.operational_mode)    
+    return (options.operational_mode, options.verbose)    
 
 
 class winclip:
@@ -75,10 +80,10 @@ class winclip:
             self.win32clipboard.CloseClipboard()
             #find cursor possition 
             null = string.find(result, chr(0))
-            if null >=0:
+            if null > 0:
                 result = result[0:null]
-            else:
-				logging.error("null not found in clipboard get")
+            #~ else:
+                #~ logging.error("null not found in clipboard get")
             return result
 
         def clipboard_set(self,aString):
@@ -89,6 +94,7 @@ class winclip:
             return
 
     except ImportError:
+        logging.debug("clipboard import error")
         fake_clip = None
 
         def clipboard_wait_open(self):
@@ -108,11 +114,12 @@ def vc_toggle_name():
     try:
         clipboard_instance = winclip()  
         clipboard_string = clipboard_instance.clipboard_get()    
-        #logging.debug( "clip result = |%s|" % result
+        #~ logging.debug( "clip result = |%s|" % clipboard_string)
+        
         if clipboard_string:
-            logging.debug("VTN start 1 %s" % clipboard_string)
-            tn = ToggleName(clipboard_string,s2c=True,cn=True)
-            tn.toggle()
+            logging.debug("VTN start 1 |%s|" % clipboard_string)
+            tn = ToggleName(clipboard_string)
+            tn.toggle(s2c=True,cn=True)
             result = tn.reasemble()
             
             # place back in the clipboard
@@ -126,6 +133,29 @@ def vc_toggle_name():
 
     return ""
 
+def vc_fix_unknown():
+	logging.debug("VFU start 0")
+    try:
+        clipboard_instance = winclip()  
+        clipboard_string = clipboard_instance.clipboard_get()    
+        #~ logging.debug( "clip result = |%s|" % clipboard_string)
+        
+        if clipboard_string:
+            logging.debug("VFU start 1 |%s|" % clipboard_string)
+            tn = ToggleName(clipboard_string)
+            tn.fix_unknown()
+            result = tn.reasemble()
+            
+            # place back in the clipboard
+            clipboard_instance.clipboard_set(result)
+            logging.debug( "result = |%s|" % result)
+            # logging.Debux("VTN start 2 %s" %repr(ignore_data))
+    except Exception, error:
+        logging.debug( "VFU %s" %(repr(error)))
+        traceback_string = traceback.format_exc()
+        logging.debug( "VFU TB %s" % traceback_string)
+
+    return ""
 
 
 
@@ -167,7 +197,7 @@ def tests():
 
 if '__main__'==__name__ :
    
-    mode = commandline()
+    mode, verbose = commandline()
     if mode == "t":
         tests()
     elif mode == "ct": 
