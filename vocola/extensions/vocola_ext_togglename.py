@@ -43,7 +43,7 @@ def commandline():
   
     parser.add_option("-m", type="string", dest='operational_mode',
         default = "st",
-        help="choose c[t|m] for clipboard, s[t|m] for stdin, t = test"
+        help="choose c[t|f] for clipboard, s[t|f] for stdin, t = test"
                       )
                       
     parser.add_option("-v", "--verbose", action = "store_true",
@@ -134,7 +134,7 @@ def vc_toggle_name():
     return ""
 
 def vc_fix_unknown():
-	logging.debug("VFU start 0")
+    logging.debug("VFU start 0")
     try:
         clipboard_instance = winclip()  
         clipboard_string = clipboard_instance.clipboard_get()    
@@ -203,8 +203,8 @@ if '__main__'==__name__ :
     elif mode == "ct": 
         vc_toggle_name()
 
-    elif mode == "cm": 
-        vc_match_name()
+    elif mode == "cf": 
+        vc_fix_unknown()
 
     elif mode == "st": 
         stdio_toggle_name()
