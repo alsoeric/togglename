@@ -1,0 +1,40 @@
+flip|toggle name|region|line|method|class
+
+note: flip is codename to stringname, toggle is stringname to codename
+
+fix unknown (move to start of region, search forward for !!unknown or
+!unknown!. delete unknown from !!unknown form leaving cursor after !!, delete
+all of !unknown! replace with cursor)
+
+toggle equals (toggle name then = ) note: need a bunch of commands
+combining operators and togglename.  maybe expand the above to "toggle
+plus" or "toggle logical or"
+
+index name ( toggle name then [""]^b^b) 
+
+index value ( toggle name then []^b)
+
+new class (class !unknown!:)
+
+note: fix unknown can add class name
+
+add [1|2|3|4|5] argument|arguments ( search for arg list and add
+    !!unknown arguments
+given:
+    goo( arg1, arg2)
+say:
+    add 2 arguments
+result:
+    goo( arg1, arg2, !!unknown, !!unknown)
+say:
+    fix unknown...
+
+
+new method (def !unknown! (self,):)
+note: fix unknown can add method name
+
+[kill|remove] arg [1|2|3|4|5]
+note: remove an argument
+
+note: how do I say... synonmyn for flipname
+
