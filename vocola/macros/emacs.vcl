@@ -85,7 +85,7 @@ toggle class = {esc}xpy-kill-class{enter}
 	      {ctrl+y};
 
 # py-kill-def
-toggle (definition|method)  = {esc}xpy-kill-statement{enter}
+toggle (definition|method)  = {esc}xpy-kill-def{enter}
               Wait(0)
               toggle.name(1,0) 
 	      {ctrl+y};
