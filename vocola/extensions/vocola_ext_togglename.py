@@ -108,8 +108,9 @@ class winclip:
             return True
 
 # vocola interfaces
-# Vocola function: toggle.name
-def vc_toggle_name():
+# Vocola function: toggle.name, 2-
+def vc_toggle_names(gs2c, gcn):
+    
     logging.debug("VTN start 0")
     try:
         clipboard_instance = winclip()  
@@ -117,9 +118,8 @@ def vc_toggle_name():
         #~ logging.debug( "clip result = |%s|" % clipboard_string)
         
         if clipboard_string:
-            logging.debug("VTN start 1 |%s|" % clipboard_string)
             tn = ToggleName(clipboard_string)
-            tn.toggle(s2c=True,cn=True)
+            tn.toggle(s2c=bool(gs2c),cn=bool(gcn))
             result = tn.reasemble()
             
             # place back in the clipboard

@@ -54,12 +54,42 @@ right   (character={ctrl+f}|
 toggle name = {ctrl+q}{ctrl+a}
               {ctrl+a}{ctrl+@}{ctrl+e}{ctrl+w} 
               Wait(0)
-              toggle.name() 
-			  {ctrl+y};
-			  #we should keep the cursor ^A \x01 in the clip,
-			  #find it, delete it,
-			  #end, leave cursor there 
+              toggle.name(1,1) 
+	      {ctrl+y}
+	      {ctrl+a}
+	      {ctrl+s}
+	      {ctrl+q}{ctrl+a}
+	      {ctrl+b}{ctrl+d};
+	      #we should keep the cursor ^A \x01 in the clip,
+	      #find it, delete it,
+	      #end, leave cursor there 
+	      # CLIPSAVE()/CLIPRESTORE();b
+
+# py-kill-statement
+toggle statement = {esc}xpy-kill-statement{enter}
+              Wait(0)
+              toggle.name(1,0) 
+	      {ctrl+y};
 	      # CLIPSAVE()/CLIPRESTORE();
+
+# py-kill-expression
+toggle expression = {esc}xpy-kill-expression{enter}
+              Wait(0)
+              toggle.name(1,0) 
+	      {ctrl+y};
+	      # CLIPSAVE()/CLIPRESTORE();
+# py-kill-class
+toggle class = {esc}xpy-kill-class{enter}
+              Wait(0)
+              toggle.name(1,0) 
+	      {ctrl+y};
+
+# py-kill-def
+toggle (definition|method)  = {esc}xpy-kill-statement{enter}
+              Wait(0)
+              toggle.name(1,0) 
+	      {ctrl+y};
+
 ### 
 
 # add argument = 
