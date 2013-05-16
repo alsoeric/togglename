@@ -10,7 +10,7 @@ import logging
 from optparse import OptionParser
 import traceback
 
-logging.basicConfig(filename='C:/Users/Tonis/Documents/toggle_name/toggle_name.log',
+logging.basicConfig(filename='C:/Users/esj/Documents/toggle_name/toggle_name.log',
                     level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 console = logging.StreamHandler()
