@@ -49,17 +49,20 @@ def commandline():
   
     parser.add_option("-m", type="string", dest='operational_mode',
         default = "st",
-        help="choose c[t|f] for clipboard, s[t|f] for stdin, t = test"
+        help="""Choose c[t|f|r] for clipboard, s[t|f|r] for stdin, t = test
+        t - toggle
+        f - fixunknown
+        r - reverse toggle""" #This doesn't print right in the [-h]elp page...
                       )
-                      
-    parser.add_option("-v", "--verbose", action = "store_true",
-                      dest = "verbose", default = False,
-                      help = "Will print out clip and toggle result"
+    
+    parser.add_option("-c", "--cursor", action = "store_true",
+                      dest = "cn", default = False,
+                      help = "Cursor needed. Use if you only want to effect where the cursor is"
                       )
         
     (options, parse_args) = parser.parse_args()
 
-    return (options.operational_mode, options.verbose)    
+    return options.operational_mode , options.cn 
 
 
 class winclip:
@@ -205,11 +208,14 @@ def tests():
 
 if '__main__'==__name__ :
    
-    mode, verbose = commandline()
+    mode, cn = commandline()
     if mode == "t":
         tests()
     elif mode == "ct": 
-        vc_toggle_names()
+        vc_toggle_names(True, cn)
+
+    elif mode == "cr":
+        vc_toggle_names(False, cn)
 
     elif mode == "cf": 
         vc_fix_unknown()

@@ -243,7 +243,7 @@ class ToggleName():
                      string_name,
                      code_name]:
             result.append(self.component_count.get(type, 0))
-        logging.debug(str(self.component_count))
+        #~ logging.debug(str(self.component_count))
         return tuple(result)
         
     def q_not_Name(self):

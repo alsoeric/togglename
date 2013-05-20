@@ -128,7 +128,7 @@ for test, s2c, cn, result in test_set:
         print("Test passed: " + test)
     else:
         print("Test failed: Beginning data dump")
-        print("Test:", test)
+        print("Test:" + test)
         print("Correct result: |%s|"%result)
         print("Actual result: |%s|"%tr)
         print("----")
