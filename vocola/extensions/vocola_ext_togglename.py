@@ -9,8 +9,14 @@ import sqlite3dbm
 import logging
 from optparse import OptionParser
 import traceback
+import os
 
-logging.basicConfig(filename='C:/Users/esj/Documents/toggle_name/toggle_name.log',
+user_dir = os.environ['USERPROFILE']
+log_path = os.path.abspath(os.path.join(user_dir,'Documents/toggle_name/'))
+log_name = 'toggle_name.log'
+if not os.path.exists(log_path):
+    os.mkdir(log_path)
+logging.basicConfig(filename=os.path.join(log_path,log_name),
                     level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 console = logging.StreamHandler()
@@ -28,7 +34,7 @@ from tn import *
 # togglename.py
 #
 # site control variables
-toggle_name_DB = "C:/Users/esj/Documents/toggle_name/togglename.sqlite"
+toggle_name_DB = os.path.join(user_dir,"/Documents/toggle_name/togglename.sqlite")
 
 #Commandline processing
 ######### helper functions ##########
@@ -109,22 +115,24 @@ class winclip:
 
 # vocola interfaces
 # Vocola function: toggle.name, 2-
-def vc_toggle_names(gs2c, gcn):
+def vc_toggle_names(gs2c=1, gcn=0):
     
     logging.debug("VTN start 0")
     try:
         clipboard_instance = winclip()  
         clipboard_string = clipboard_instance.clipboard_get()    
-        #~ logging.debug( "clip result = |%s|" % clipboard_string)
+        logging.debug( "result from clip = |%s|" % clipboard_string)
         
         if clipboard_string:
+            logging.debug("Starting ToggleBox: s2c = %s, cn = %s"%(gs2c, gcn))
             tn = ToggleName(clipboard_string)
             tn.toggle(s2c=bool(gs2c),cn=bool(gcn))
             result = tn.reasemble()
+            logging.debug("parsed component counts: nn=%s, bn=%s, sn=%s, cn=%s"%(tn.get_count())) 
             
             # place back in the clipboard
             clipboard_instance.clipboard_set(result)
-            logging.debug( "result = |%s|" % result)
+            logging.debug( "toggle result = |%s|" % result)
             # logging.Debux("VTN start 2 %s" %repr(ignore_data))
     except Exception, error:
         logging.debug( "VTN %s" %(repr(error)))
@@ -201,13 +209,13 @@ if '__main__'==__name__ :
     if mode == "t":
         tests()
     elif mode == "ct": 
-        vc_toggle_name()
+        vc_toggle_names()
 
     elif mode == "cf": 
         vc_fix_unknown()
 
     elif mode == "st": 
-        stdio_toggle_name()
+        stdio_toggle_name() # no such things    
         
     elif mode == "sm": 
         stdio_match_name()    
