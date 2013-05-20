@@ -1,5 +1,6 @@
 #!/bin/env python
 
+# import rpdb2; rpdb2.start_embedded_debugger("123456")
 # system imports:
 import sys
 import string
@@ -111,7 +112,7 @@ class winclip:
 # Vocola function: toggle.name, 2-
 def vc_toggle_names(gs2c, gcn):
     
-    logging.debug("VTN start 0")
+    logging.debug("VTN start 0 %s, %s"%(int(gs2c),int(gcn)))
     try:
         clipboard_instance = winclip()  
         clipboard_string = clipboard_instance.clipboard_get()    
@@ -119,7 +120,7 @@ def vc_toggle_names(gs2c, gcn):
         
         if clipboard_string:
             tn = ToggleName(clipboard_string)
-            tn.toggle(s2c=bool(gs2c),cn=bool(gcn))
+            tn.toggle(s2c=int(gs2c),cn=int(gcn))
             result = tn.reasemble()
             
             # place back in the clipboard
@@ -133,6 +134,7 @@ def vc_toggle_names(gs2c, gcn):
 
     return ""
 
+# Vocola function: toggle.unknown, 1-
 def vc_fix_unknown():
     logging.debug("VFU start 0")
     try:

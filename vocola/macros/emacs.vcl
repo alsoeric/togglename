@@ -51,6 +51,10 @@ right   (character={ctrl+f}|
 
 #
 ### Toggle name commands
+
+savemp():= {ctrl+x}r{space}z{ctrl+x}{ctrl+x}{ctrl+x}r{space}a;
+restoreMP() := {ctrl+x}rjz{esc}xset-mark{ctrl+x}rja;
+
 toggle name = {ctrl+q}{ctrl+a}
               {ctrl+a}{ctrl+@}{ctrl+e}{ctrl+w} 
               Wait(0)
@@ -85,14 +89,36 @@ toggle class = {esc}xpy-kill-class{enter}
 	      {ctrl+y};
 
 # py-kill-def
-toggle (definition|method)  = {esc}xpy-kill-def{enter}
+toggle (definition|method) = {esc}xpy-kill-def{enter}
               Wait(0)
               toggle.name(1,0) 
 	      {ctrl+y};
 
+# fix unknown match (don't move mark or point)
+
+fix (region|next) = {ctrl+w} 
+              Wait(0)
+              toggle.unknown(1,1) 
+	      {ctrl+y};
+
+fix unknown = {ctrl+q}{ctrl+a}
+              {ctrl+a}{ctrl+@}{ctrl+e}{ctrl+w} 
+              Wait(0)
+              toggle.unknown(1,1) 
+	      {ctrl+y}
+	      {ctrl+a}
+	      {ctrl+s}
+	      {ctrl+q}{ctrl+a}
+	      {ctrl+b}{ctrl+d};
+
+	      #we should keep the cursor ^A \x01 in the clip,
+	      #find it, delete it,
+	      #end, leave cursor there 
+	      # CLIPSAVE()/CLIPRESTORE();
+
 ### 
 
-# add argument = 
+### add argument = 
 # -------
 do(command) := {Alt+x} $command {Enter};
 elisp(e) := {Alt+:} $e {Enter};
