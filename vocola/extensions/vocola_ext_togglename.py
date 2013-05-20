@@ -10,8 +10,14 @@ import sqlite3dbm
 import logging
 from optparse import OptionParser
 import traceback
+import os
 
-logging.basicConfig(filename='C:/Users/esj/Documents/toggle_name/toggle_name.log',
+user_dir = os.environ['USERPROFILE']
+log_path = os.path.abspath(os.path.join(user_dir,'Documents/toggle_name/'))
+log_name = 'toggle_name.log'
+if not os.path.exists(log_path):
+    os.mkdir(log_path)
+logging.basicConfig(filename=os.path.join(log_path,log_name),
                     level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 console = logging.StreamHandler()
@@ -29,7 +35,7 @@ from tn import *
 # togglename.py
 #
 # site control variables
-toggle_name_DB = "C:/Users/esj/Documents/toggle_name/togglename.sqlite"
+toggle_name_DB = os.path.join(user_dir,"/Documents/toggle_name/togglename.sqlite")
 
 #Commandline processing
 ######### helper functions ##########
@@ -44,17 +50,20 @@ def commandline():
   
     parser.add_option("-m", type="string", dest='operational_mode',
         default = "st",
-        help="choose c[t|f] for clipboard, s[t|f] for stdin, t = test"
+        help="""Choose c[t|f|r] for clipboard, s[t|f|r] for stdin, t = test
+        t - toggle
+        f - fixunknown
+        r - reverse toggle""" #This doesn't print right in the [-h]elp page...
                       )
-                      
-    parser.add_option("-v", "--verbose", action = "store_true",
-                      dest = "verbose", default = False,
-                      help = "Will print out clip and toggle result"
+    
+    parser.add_option("-c", "--cursor", action = "store_true",
+                      dest = "cn", default = False,
+                      help = "Cursor needed. Use if you only want to effect where the cursor is"
                       )
         
     (options, parse_args) = parser.parse_args()
 
-    return (options.operational_mode, options.verbose)    
+    return options.operational_mode , options.cn 
 
 
 class winclip:
@@ -110,22 +119,24 @@ class winclip:
 
 # vocola interfaces
 # Vocola function: toggle.name, 2-
-def vc_toggle_names(gs2c, gcn):
+def vc_toggle_names(gs2c=1, gcn=0):
     
     logging.debug("VTN start 0 %s, %s"%(int(gs2c),int(gcn)))
     try:
         clipboard_instance = winclip()  
         clipboard_string = clipboard_instance.clipboard_get()    
-        #~ logging.debug( "clip result = |%s|" % clipboard_string)
+        logging.debug( "result from clip = |%s|" % clipboard_string)
         
         if clipboard_string:
+            logging.debug("Starting ToggleBox: s2c = %s, cn = %s"%(gs2c, gcn))
             tn = ToggleName(clipboard_string)
             tn.toggle(s2c=int(gs2c),cn=int(gcn))
             result = tn.reasemble()
+            logging.debug("parsed component counts: nn=%s, bn=%s, sn=%s, cn=%s"%(tn.get_count())) 
             
             # place back in the clipboard
             clipboard_instance.clipboard_set(result)
-            logging.debug( "result = |%s|" % result)
+            logging.debug( "toggle result = |%s|" % result)
             # logging.Debux("VTN start 2 %s" %repr(ignore_data))
     except Exception, error:
         logging.debug( "VTN %s" %(repr(error)))
@@ -199,17 +210,20 @@ def tests():
 
 if '__main__'==__name__ :
    
-    mode, verbose = commandline()
+    mode, cn = commandline()
     if mode == "t":
         tests()
     elif mode == "ct": 
-        vc_toggle_name()
+        vc_toggle_names(True, cn)
+
+    elif mode == "cr":
+        vc_toggle_names(False, cn)
 
     elif mode == "cf": 
         vc_fix_unknown()
 
     elif mode == "st": 
-        stdio_toggle_name()
+        stdio_toggle_name() # no such things    
         
     elif mode == "sm": 
         stdio_match_name()    

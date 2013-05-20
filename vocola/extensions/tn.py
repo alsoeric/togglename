@@ -90,7 +90,7 @@ class sqlHandle():
         """Returns the value at self.handle[key] or None"""
         self.open()
         val = self.handle.get(key, None)
-        logging.debug("SQL val look up: |%s|" % (val))
+        logging.debug("SQL val look up with key |%s|: |%s|" % (key, val))
         self.close()
         return val
     
@@ -100,6 +100,7 @@ class sqlHandle():
         If no key, returns None""" 
         self.open()
         key = next((key  for key, val in self.handle.items() if val == search_val), None)
+        logging.debug("SQL key look up with val |%s|: |%s|" % (search_val, key))
         self.close()
         return key
     
@@ -143,19 +144,14 @@ def key_word(string):
 
 class ToggleName():
 
-    def __init__(self,data,
-                 #s2c=True,
-                 #cn=True
-                 ):
+    def __init__(self,data):
+        
         self.data = data
         self.remainingdata = data
         
         
         self.component_list = []
-        
-        #~ #Bools
-        #~ self.s2c = s2c #string to code
-        #~ self.cn = cn #cursor needed
+        self.component_count = {} 
     
     def reasemble(self):
         rs = ""
@@ -168,24 +164,29 @@ class ToggleName():
         """Togglename command
         s2c = string to code. The direction of toggle. Toggle/flip
         """
+        
+        cursor_found = False
         for token in self.component():
-            if (isinstance(token, string_name) and
-                cn == token.has_cursor() and 
-                s2c == True):
-                # Early out if cn?
+            if cn and token.has_cursor():
+                cursor_found = True
+            
+            if (isinstance(token, string_name) and 
+                s2c == True and
+                cn == cursor_found):
                 token = token.convert()
                 
-            elif (isinstance(token, code_name) and
-                cn == token.has_cursor() and 
-                s2c == False):
-                
+            elif (isinstance(token, code_name) and 
+                s2c == False and
+                cn == cursor_found):
                 token = token.convert()
             
-            elif (isinstance(token, bang_name) and
-                  cn == token.has_cursor()):
+            elif (isinstance(token, bang_name)and
+                cn == cursor_found):
                 token = token.matchname(s2c)
             
             self.component_list.append(token)
+            if cursor_found:
+                break
         return 
             
         
@@ -212,10 +213,9 @@ class ToggleName():
     
     def component(self):
         """convert data into indiviual data types"""
-        #Doesn't it makes more sence for the s2c and cn requrements apear here?
                 
-        test_list = [self.q_not_Name,
-                    self.q_bang_name,
+        test_list = [self.q_not_Name, #looks for punkucations + whitespace + comments + quotes
+                    self.q_bang_name, #handles floating !!'s
                     self.q_stringname,
                     self.q_codename,
                     ]
@@ -225,12 +225,27 @@ class ToggleName():
             for i in test_list:
                 objname = i()
                 if objname:
+                    self.count(objname)
                     yield objname
                     break
                     
         return
                 
-
+    def count(self, component):
+        """increments the compnent types count by 1 in self.component_count"""
+        self.component_count[component.__class__] = self.component_count.get(component.__class__, 0) + 1
+        
+    def get_count(self):
+        """Returns a tuple of 4 ints. Each int corisponding to the count of component types in the order of nn bn sn cn"""
+        result = []
+        for type in [not_name,
+                     bang_name,
+                     string_name,
+                     code_name]:
+            result.append(self.component_count.get(type, 0))
+        #~ logging.debug(str(self.component_count))
+        return tuple(result)
+        
     def q_not_Name(self):
         """Returns not_name Object and updates self.remaningData
         otherwise returns None"""
@@ -362,8 +377,13 @@ class ToggleName():
             
         pre_bang_str = self.remainingdata[:start_index + bang_offset]
         self.remainingdata = self.remainingdata[start_index + bang_offset:]
-        cd_data = self.q_codename().present()
-        return bang_name(pre_bang_str + cd_data)
+        
+        post_bang_data = self.q_codename()#Calls q_codename to capture whateever is after the !!
+        if post_bang_data is None: #will only happen if for some reason a !! is followed by nothing.
+            post_bang_string = "" #Should this be a "unknown"?
+        else:
+            post_bang_string = post_bang_data.present()
+        return bang_name(pre_bang_str + post_bang_string)
     
     def q_unknown(self):
         """returns unknown object"""
@@ -554,7 +574,7 @@ class bang_name(component_Parent):
         if left == "":
             self.data = right    
         else:
-            self.data = "!!".join((left,right))
+            self.data = left + "!!" + right
         
         return True
 class not_name(component_Parent):
