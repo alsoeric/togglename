@@ -27,7 +27,7 @@ import pickle
 test_set = [
                 ("",1, 0 , ""),
                 ("",0, 0 , ""),
-                
+
                 ("apple pie",1,0, "aplpie"),   
                 ("apple pie",0,0, "apple pie"),
                 ("apple pie",1,1, "apple pie"),
@@ -90,6 +90,13 @@ test_set = [
                 
                 # "!!unknown or !unknown!
                 ("class !!unknown ()", 1,0, ""),
+                ("""def Recursive add (digit):
+    Great big some = great big some plus digit
+    if great big some < 100:
+        Recursive add (great big some)
+
+    return great big some
+""",1,0,""),
                 ]
                 
                 
