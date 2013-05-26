@@ -159,7 +159,11 @@ class ToggleName():
             data = component.present()
             rs += data
         return rs + self.remainingdata
-    
+
+    def goto_start(self):
+        self.data = self.reasemble()
+        self.remainingdata = self.data
+        
     def toggle(self, s2c= True, cn= True ):
         """Togglename command
         s2c = string to code. The direction of toggle. Toggle/flip
@@ -254,7 +258,6 @@ class ToggleName():
         #untouchables, (quote strings & comments)
         #whiteSpace
         #puncuation (not inculding '_' or '\x01' or #)
-        #
         #Ignores 
         
         def white_space(string):

@@ -53,68 +53,77 @@ right   (character={ctrl+f}|
 ### Toggle name commands
 
 savemp():= {ctrl+x}r{space}z{ctrl+x}{ctrl+x}{ctrl+x}r{space}a;
-restoreMP() := {ctrl+x}rjz{esc}xset-mark{ctrl+x}rja;
+restoremp() := {ctrl+x}rjz{esc}xset-mark{ctrl+x}rja;
+tncleanup() := {ctrl+y}
+              {ctrl+x}{ctrl+x}
+              {ctrl+s}{ctrl+q}{ctrl+a} # search forward for cursor marker
+              {ctrl+@}{backspace};
 
-toggle name = {ctrl+q}{ctrl+a}
-              {ctrl+a}{ctrl+@}{ctrl+e}{ctrl+w} 
-              Wait(0)
-              toggle.name(1,1) 
+use this region = savemp();
+
+toggle name = {ctrl+q}{ctrl+a} # insert cusror marker
+              {ctrl+a}{ctrl+@}{ctrl+e}{ctrl+w} # grab line 
+              Wait(0) # wait to flush character queue
+              toggle.name(1,1) # string to code, need cursor marker
 	      {ctrl+y}
+              # move point to end of symbol and ^a
 	      {ctrl+a}
-	      {ctrl+s}
-	      {ctrl+q}{ctrl+a}
-	      {ctrl+b}{ctrl+d};
-	      #we should keep the cursor ^A \x01 in the clip,
-	      #find it, delete it,
-	      #end, leave cursor there 
+	      {ctrl+s} # look for cursor
+	      {ctrl+q}{ctrl+a}{ctrl+@}{backspace};
+
 	      # CLIPSAVE()/CLIPRESTORE();b
 
-# py-kill-statement
 toggle statement = {esc}xpy-kill-statement{enter}
               Wait(0)
               toggle.name(1,0) 
-	      {ctrl+y};
+	      {ctrl+y}
+              savemp();
 	      # CLIPSAVE()/CLIPRESTORE();
+
 
 # py-kill-expression
 toggle expression = {esc}xpy-kill-expression{enter}
               Wait(0)
               toggle.name(1,0) 
-	      {ctrl+y};
+	      {ctrl+y}
+              savemp();
 	      # CLIPSAVE()/CLIPRESTORE();
-# py-kill-class
+
 toggle class = {esc}xpy-kill-class{enter}
               Wait(0)
               toggle.name(1,0) 
-	      {ctrl+y};
+	      {ctrl+y}
+              savemp();
 
-# py-kill-def
 toggle (definition|method) = {esc}xpy-kill-def{enter}
               Wait(0)
               toggle.name(1,0) 
-	      {ctrl+y};
-
-# fix unknown match (don't move mark or point)
-
-fix (region|next) = {ctrl+w} 
-              Wait(0)
-              toggle.unknown(1,1) 
-	      {ctrl+y};
-
-fix unknown = {ctrl+q}{ctrl+a}
-              {ctrl+a}{ctrl+@}{ctrl+e}{ctrl+w} 
-              Wait(0)
-              toggle.unknown(1,1) 
 	      {ctrl+y}
-	      {ctrl+a}
-	      {ctrl+s}
-	      {ctrl+q}{ctrl+a}
-	      {ctrl+b}{ctrl+d};
+              savemp();
 
-	      #we should keep the cursor ^A \x01 in the clip,
-	      #find it, delete it,
-	      #end, leave cursor there 
-	      # CLIPSAVE()/CLIPRESTORE();
+
+(fix|fixed) region =  restoremp()
+              {ctrl+w} 
+              Wait(0)
+              toggle.unknown() 
+	      tncleanup()
+	      ;
+
+(fix|fixed) next =    restoremp()
+              {ctrl+w} 
+              Wait(0)
+              # fix names and move to next unknown
+              toggle.firstunknown() 
+	      tncleanup()
+	      ;
+
+(fix|fixed) unknown = {ctrl+a}{ctrl+@}{ctrl+e}
+              {ctrl+w} 
+              Wait(0)
+    	      toggle.firstunknown()
+	      tncleanup()
+	      ;
+
 
 ### 
 
@@ -424,3 +433,4 @@ include keys.vch;
   Error (Up=p | Down=n) Go = {Alt+$1}{Enter};
   Error (Up=p | Down=n) 1..30 = {Alt+$1_$2};
   Error (Up=p | Down=n) 1..30 Go = {Alt+$1_$2}{Enter};
+

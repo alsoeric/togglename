@@ -145,8 +145,35 @@ def vc_toggle_names(gs2c=1, gcn=0):
 
     return ""
 
-# Vocola function: toggle.unknown, 1-
+# Vocola function: toggle.unknown
 def vc_fix_unknown():
+    logging.debug("VFU start 0")
+    try:
+        clipboard_instance = winclip()  
+        clipboard_string = clipboard_instance.clipboard_get()    
+        #~ logging.debug( "clip result = |%s|" % clipboard_string)
+        
+        if clipboard_string:
+            logging.debug("VFU start 1 |%s|" % clipboard_string)
+            tn = ToggleName(clipboard_string)
+            tn.toggle(s2c=1,cn=0)
+            tn.goto_start()
+            tn.fix_unknown()
+            result = tn.reasemble()
+            
+            # place back in the clipboard
+            clipboard_instance.clipboard_set(result)
+            logging.debug( "result = |%s|" % result)
+            # logging.Debux("VTN start 2 %s" %repr(ignore_data))
+    except Exception, error:
+        logging.debug( "VFU %s" %(repr(error)))
+        traceback_string = traceback.format_exc()
+        logging.debug( "VFU TB %s" % traceback_string)
+
+    return ""
+
+# Vocola function: toggle.firstunknown
+def vc_first_unknown():
     logging.debug("VFU start 0")
     try:
         clipboard_instance = winclip()  
@@ -169,8 +196,6 @@ def vc_fix_unknown():
         logging.debug( "VFU TB %s" % traceback_string)
 
     return ""
-
-
 
 ### Old tests need to be updated to inlude toggle_tests.py
 def tests():
