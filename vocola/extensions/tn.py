@@ -161,8 +161,7 @@ class ToggleName():
         return rs + self.remainingdata
 
     def goto_start(self):
-        self.data = self.reasemble()
-        self.remainingdata = self.data
+        ToggleName.__init__(self, self.reasemble())
         
     def toggle(self, s2c= True, cn= True ):
         """Togglename command
