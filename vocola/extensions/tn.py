@@ -200,7 +200,7 @@ class ToggleName():
         does a look to be sure it is not there
         """
         
-        if not bool(self.get_parsed_data()): #Restart the parsing to the beginning.
+        if bool(self.get_parsed_data()): #Restart the parsing to the beginning.
             self.goto_start()
         
         self.remainingdata = self.data.replace(CURSOR_MARKER,"")
