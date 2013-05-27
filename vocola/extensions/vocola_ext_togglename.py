@@ -160,10 +160,10 @@ def vc_fix_unknown():
             #tn.goto_start() #Not needed, fix_unknown() does a test if nessasarry.
             tn.fix_unknown()
             result = tn.reasemble()
+            logging.debug( "VFU result = |%s|" % result)
             
             # place back in the clipboard
             clipboard_instance.clipboard_set(result)
-            logging.debug( "result = |%s|" % result)
             # logging.Debux("VTN start 2 %s" %repr(ignore_data))
     except Exception, error:
         logging.debug( "VFU %s" %(repr(error)))

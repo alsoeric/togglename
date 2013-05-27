@@ -52,12 +52,25 @@ right   (character={ctrl+f}|
 #
 ### Toggle name commands
 
-savemp():= {ctrl+x}r{space}z{ctrl+x}{ctrl+x}{ctrl+x}r{space}a;
-restoremp() := {ctrl+x}rjz{esc}xset-mark{ctrl+x}rja;
+savemp():= {ctrl+x}r{space}z
+           Wait(0)
+           {ctrl+x}{ctrl+x}
+           Wait(0)
+           {ctrl+x}r{space}a;
+
+restoremp() := {ctrl+x}rjz
+               Wait(0)
+               {ctrl+@}
+               Wait(0)
+               {ctrl+x}rja;
+
 tncleanup() := {ctrl+y}
-              {ctrl+x}{ctrl+x}
-              {ctrl+s}{ctrl+q}{ctrl+a} # search forward for cursor marker
-              {ctrl+@}{backspace};
+               Wait(0)
+               {ctrl+x}{ctrl+x}
+               Wait(0)
+               {ctrl+s}{ctrl+q}{ctrl+a} # search forward for cursor marker
+               Wait(0)
+               {ctrl+@}{backspace};
 
 use this region = savemp();
 
@@ -105,15 +118,15 @@ toggle (definition|method) = {esc}xpy-kill-def{enter}
 (fix|fixed) region =  restoremp()
               {ctrl+w} 
               Wait(0)
-              toggle.unknown() 
+              # fix names and move to next unknown
+              toggle.firstunknown() 
 	      tncleanup()
 	      ;
 
 (fix|fixed) next =    restoremp()
               {ctrl+w} 
               Wait(0)
-              # fix names and move to next unknown
-              toggle.firstunknown() 
+              toggle.unknown() 
 	      tncleanup()
 	      ;
 
