@@ -157,7 +157,7 @@ def vc_fix_unknown():
             logging.debug("VFU start 1 |%s|" % clipboard_string)
             tn = ToggleName(clipboard_string)
             tn.toggle(s2c=1,cn=0)
-            tn.goto_start()
+            #tn.goto_start() #Not needed, fix_unknown() does a test if nessasarry.
             tn.fix_unknown()
             result = tn.reasemble()
             

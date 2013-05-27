@@ -67,11 +67,8 @@ language_keywords = ['and',
                     'try',
                     'self',
 ]
-#~ foo = getregion(data, s2c, cn)
-#~ for part in foo.component():
-    #~ part.convert()
-    #~ retrline += part.present()
-#~ return retrline
+
+CURSOR_MARKER = "\x01"
 
 class sqlHandle():
     def open(self):
@@ -127,7 +124,7 @@ def first_word(string):
     end of string is denoted by whitespace, or punk"""
     word = ""
     for char in string:
-        if char.isspace() or not char.isalpha() and not char =="\x01":
+        if char.isspace() or not char.isalpha() and not char == CURSOR_MARKER:
             break
         else:
             word += char
@@ -136,7 +133,7 @@ def first_word(string):
 def key_word(string):
     """returns lenght of the keyword at the begining of a str"""
     fw = first_word(string)
-    first_word_sans_curser = fw.replace("\x01", "")
+    first_word_sans_curser = fw.replace(CURSOR_MARKER, "")
     for keyword in language_keywords:
         if first_word_sans_curser == keyword:
             return len(fw)
@@ -167,6 +164,9 @@ class ToggleName():
         """Togglename command
         s2c = string to code. The direction of toggle. Toggle/flip
         """
+        
+        #Maybe do a if not bool(self.get_parsed_data()): self.goto_start() ?
+        #I don't think there's a time that we would call toggle twice in the same isntance, but for the furture maybe?
         
         cursor_found = False
         for token in self.component():
@@ -199,7 +199,11 @@ class ToggleName():
         cursor should not be in data,
         does a look to be sure it is not there
         """
-        self.remainingdata = self.data.replace("\x01","")
+        
+        if not bool(self.get_parsed_data()): #Restart the parsing to the beginning.
+            self.goto_start()
+        
+        self.remainingdata = self.data.replace(CURSOR_MARKER,"")
         
         for part in self.component():
             self.component_list.append(part)
@@ -207,7 +211,7 @@ class ToggleName():
                 if part.fix_unknown():
                     break
         else:
-            self.remainingdata += "\x01"
+            self.remainingdata += CURSOR_MARKER
                     
         return 
 
@@ -274,7 +278,7 @@ class ToggleName():
             """returns the lenght of puncuation at the beggining of str"""
             length = 0
             for index, char in enumerate(string):
-                if char.isalnum() or char in ("_", "\x01", "#", "'", '"', '"""') or char.isspace():
+                if char.isalnum() or char in ("_", CURSOR_MARKER, "#", "'", '"', '"""') or char.isspace():
                     break
                 
                 if string[index:].startswith("!!"):
@@ -346,7 +350,7 @@ class ToggleName():
         assumes that self.reaningdata does NOT start with a keyword"""     
         length = 0
         for char in self.remainingdata:
-            if not char.isalnum() and char not in ("\x01", "_"):
+            if not char.isalnum() and char not in (CURSOR_MARKER, "_"):
                 break
             length += 1
         
@@ -372,7 +376,7 @@ class ToggleName():
         if self.remainingdata[start_index:].startswith("!!"):
             bang_offset = 2 
             
-        elif self.remainingdata[start_index:].startswith("!\x01!"):
+        elif self.remainingdata[start_index:].startswith("!"+CURSOR_MARKER+"!"):
             bang_offset = 3
         else:
             return 0
@@ -398,7 +402,7 @@ class ToggleName():
         if self.remainingdata[0].isdigit():
             return None
         for char in self.remainingdata:
-            if char == "\x01":
+            if char == CURSOR_MARKER:
                 #~ name_string = "\x01" + name_string
                 pass
                 #~ continue
@@ -410,7 +414,7 @@ class ToggleName():
                 name_len = len(name_string)
                 next_is_keyword = key_word(self.remainingdata[name_len+1:])
                 next_is_alnum = self.remainingdata[name_len+1].isalnum()
-                next_is_cursor = self.remainingdata[name_len+1] == "\x01"
+                next_is_cursor = self.remainingdata[name_len+1] == CURSOR_MARKER
                 
                 if next_is_keyword or not next_is_alnum and not next_is_cursor:                
                         break
@@ -454,9 +458,9 @@ class component_Parent():
     def __init__(self, data, had_cursor = False):
         if had_cursor == True:
             self.had_cursor = True
-        elif "\x01" in data:
+        elif CURSOR_MARKER in data:
             self.had_cursor = True
-            data = data.replace("\x01","")
+            data = data.replace(CURSOR_MARKER,"")
         else:
             self.had_cursor = False
         self.data = data
@@ -464,7 +468,7 @@ class component_Parent():
         """Returns string form of data
         it cursor was in data, adds cursor to the of string"""
         if self.had_cursor:
-            return self.data + "\x01"
+            return self.data + CURSOR_MARKER
         return self.data
         
     def has_cursor(self):
@@ -490,11 +494,11 @@ class code_name(component_Parent):
         looks up sql database for partering codename, if none,
         returns bang_name"""
         # store data in dictionary hidden inside an SQLlite database
-        if self.data == "\x01":
+        if self.data == CURSOR_MARKER:
             return self
         
         sql = sqlHandle()
-        string_n  = sql.key_lookup(self.data.replace("\x01", ""))
+        string_n  = sql.key_lookup(self.data.replace(CURSOR_MARKER, ""))
         if string_n == None:
             return bang_name("unknown!!" + self.data, had_cursor = self.had_cursor)
         else:
@@ -569,9 +573,9 @@ class bang_name(component_Parent):
             return False
         
         if right == "unknown":
-            right = "\x01"
+            right = CURSOR_MARKER
         elif left == "unknown":
-            left = "\x01"
+            left = CURSOR_MARKER
         
         if left == "":
             self.data = right    
