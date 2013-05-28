@@ -494,7 +494,7 @@ class code_name(component_Parent):
         looks up sql database for partering codename, if none,
         returns bang_name"""
         # store data in dictionary hidden inside an SQLlite database
-        if self.data == CURSOR_MARKER:
+        if self.data == CURSOR_MARKER: #This is here because a lone cursor is consiered a codename, however it should no be converted,
             return self
         
         sql = sqlHandle()
@@ -564,17 +564,19 @@ class bang_name(component_Parent):
         foo bar!!unknown    -> foo bar!!cursor
         unknown!!foo        -> cursor!!foo
         !!unknown           -> cursor
+        foobar!!            -> foobar!!cursor # This is needed incase someone calls fix_next without entering in a codename
         
         returns True if bangname has unknown, and will edit data
         otherwise returns false
         """
+        
         left, right = self.data.split("!!")
         if "unknown" not in (left, right):
             return False
         
         if right == "unknown":
             right = CURSOR_MARKER
-        elif left == "unknown":
+        elif left == "unknown" or CURSOR_MARKER:
             left = CURSOR_MARKER
         
         if left == "":
