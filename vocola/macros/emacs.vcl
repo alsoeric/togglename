@@ -19,6 +19,7 @@ search (forward={ctrl+s}|back={ctrl+r}) = $1;
 yank (again={Esc}y|it back={ctrl+y}) = $1;
 go to line = {Alt+g};
 repeat (it={ctrl+u} | twice={ctrl+u2} | thrice={ctrl+u3} ) = $1;
+leave mark = {ctrl+@};
 
 copy    (character={esc}xdelete-forward-char{enter}{ctrl+y} | 
          word= {esc}d{ctrl+y}|
@@ -53,23 +54,19 @@ right   (character={ctrl+f}|
 ### Toggle name commands
 
 savemp():= {ctrl+x}r{space}z
-           Wait(0)
            {ctrl+x}{ctrl+x}
-           Wait(0)
            {ctrl+x}r{space}a;
 
-restoremp() := {ctrl+x}rjz
-               Wait(0)
+restoremp() := {esc}xlist-registers{enter}
+	       {ctrl+x}rjz
                {ctrl+@}
-               Wait(0)
                {ctrl+x}rja;
 
+restore mark and point = restoremp();
+
 tncleanup() := {ctrl+y}
-               Wait(0)
                {ctrl+x}{ctrl+x}
-               Wait(0)
                {ctrl+s}{ctrl+q}{ctrl+a} # search forward for cursor marker
-               Wait(0)
                {ctrl+@}{backspace};
 
 use this region = savemp();
@@ -106,13 +103,15 @@ toggle class = {esc}xpy-kill-class{enter}
               Wait(0)
               toggle.name(1,0) 
 	      {ctrl+y}
-              savemp();
+              savemp()
+              ;
 
 toggle (definition|method) = {esc}xpy-kill-def{enter}
               Wait(0)
               toggle.name(1,0) 
 	      {ctrl+y}
-              savemp();
+              savemp()
+              ;
 
 
 (fix|fixed) region =  restoremp()
@@ -126,7 +125,12 @@ toggle (definition|method) = {esc}xpy-kill-def{enter}
 (fix|fixed) next =    restoremp()
               {ctrl+w} 
               Wait(0)
-              toggle.unknown() 
+	      toggle.name(1,0)
+	      # still have valid cut paste buffer
+              toggle.unknown() # preps next unknown
+	      {ctrl+y}
+	      savemp() 
+              {ctrl+w} # preps for embedded yank; searching for cursor 
 	      tncleanup()
 	      ;
 

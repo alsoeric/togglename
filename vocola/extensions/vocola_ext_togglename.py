@@ -119,7 +119,7 @@ class winclip:
 
 # vocola interfaces
 # Vocola function: toggle.name, 2-
-def vc_toggle_names(gs2c=1, gcn=0):
+def vc_toggle_name(gs2c=1, gcn=0):
     
     logging.debug("VTN start 0 %s, %s"%(int(gs2c),int(gcn)))
     try:
@@ -239,10 +239,10 @@ if '__main__'==__name__ :
     if mode == "t":
         tests()
     elif mode == "ct": 
-        vc_toggle_names(True, cn)
+        vc_toggle_name(True, cn)
 
     elif mode == "cr":
-        vc_toggle_names(False, cn)
+        vc_toggle_name(False, cn)
 
     elif mode == "cf": 
         vc_fix_unknown()
