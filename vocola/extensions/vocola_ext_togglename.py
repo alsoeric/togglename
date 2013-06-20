@@ -179,24 +179,55 @@ def vc_first_unknown():
         clipboard_instance = winclip()  
         clipboard_string = clipboard_instance.clipboard_get()    
         #~ logging.debug( "clip result = |%s|" % clipboard_string)
-        
-        if clipboard_string:
-            logging.debug("VFU start 1 |%s|" % clipboard_string)
-            tn = ToggleName(clipboard_string)
-            tn.fix_unknown()
-            result = tn.reasemble()
-            
-            # place back in the clipboard
-            clipboard_instance.clipboard_set(result)
-            logging.debug( "result = |%s|" % result)
-            # logging.Debux("VTN start 2 %s" %repr(ignore_data))
     except Exception, error:
         logging.debug( "VFU %s" %(repr(error)))
         traceback_string = traceback.format_exc()
         logging.debug( "VFU TB %s" % traceback_string)
-
+        
+        
+    if clipboard_string:
+        logging.debug("VFU start 1 |%s|" % clipboard_string)
+        tn = ToggleName(clipboard_string)
+        tn.fix_unknown()
+        result = tn.reasemble()
+        
+        # place back in the clipboard
+        clipboard_instance.clipboard_set(result)
+        logging.debug( "result = |%s|" % result)
+        # logging.Debux("VTN start 2 %s" %repr(ignore_data))
     return ""
 
+class vocola_interface:
+    def __init__(self):
+        self.ID = "VI"
+        self.clipboard_instance = None
+        self.clipboard_string = ""
+        self.result = ""
+        return
+    
+    def read_clipboard( self):
+        try:
+            self.clipboard_instance = winclip()  
+            self.clipboard_string = clipboard_instance.clipboard_get()    
+            #~ logging.debug( "clip result = |%s|" % clipboard_string)
+        except Exception, error:
+            logging.debug( "%s %s" %(self.ID, repr(error)))
+            traceback_string = traceback.format_exc()
+            logging.debug( "$s TB %s" % (self.ID, traceback_string))
+        
+    def write_clipboard (self, result):
+        # place back in the clipboard
+        self.clipboard_instance.clipboard_set(result)
+        logging.debug("%s result = |%s|" % (self.ID, result))
+
+    def action(self):
+        if self.clipboard_string:
+            logging.debug("%s start 1 |%s|" % (self.ID,clipboard_string))
+            tn = ToggleName(clipboard_string)
+            tn.fix_unknown()
+            self.result = tn.reasemble()
+        
+        
 ### Old tests need to be updated to inlude toggle_tests.py
 def tests():
     
