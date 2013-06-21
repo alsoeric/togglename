@@ -220,14 +220,71 @@ class vocola_interface:
         self.clipboard_instance.clipboard_set(result)
         logging.debug("%s result = |%s|" % (self.ID, result))
 
-    def action(self):
+    def action(self, gs2c=1, gcn=0): 
+
+        """ this is an empty method in the abstract
+        class only copying input from the clipboard to the result
+        output variable."""
+
+        self.result = self.clipboard_string 
+        return ""
+    
+class vocola_toggle_name(vocola_interfaces):
+    def __init__(self):
+        vocola_interfaces.__init__()
+        self.ID = "VTN"
+        
+    def action(self, gs2c=1, gcn=0):
         if self.clipboard_string:
-            logging.debug("%s start 1 |%s|" % (self.ID,clipboard_string))
-            tn = ToggleName(clipboard_string)
+            logging.debug("Starting ToggleBox: s2c = %s, cn = %s"%(gs2c, gcn))
+            tn = ToggleName(self.clipboard_string)
+            tn.toggle(s2c=int(gs2c),cn=int(gcn))
+            result = tn.reasemble()
+            logging.debug("%s: parsed component counts: nn=%s, bn=%s, sn=%s, cn=%s"%(self.ID, tn.get_count())) 
+            
+            # place back in the clipboard
+            clipboard_instance.clipboard_set(self.result)
+            logging.debug( "toggle result = |%s|" % self.result)
+            # logging.Debux("VTN start 2 %s" %repr(ignore_data))
+
+        return ""
+
+class vocola_fix_unknown(vocola_interfaces):
+    def __init__(self):
+        vocola_interfaces.__init__()
+        self.ID = "VFXU"
+        
+    def action(self, gs2c=1, gcn=0):
+        if self.clipboard_string:
+            logging.debug("%s start 1 |%s|" % (self.ID, self.clipboard_string))
+            tn = ToggleName(self.clipboard_string)
+            tn.toggle(s2c=1,cn=0)
+            #tn.goto_start() #Not needed, fix_unknown() does a test if nessasarry.
             tn.fix_unknown()
             self.result = tn.reasemble()
+            logging.debug( "%s result = |%s|" % (self.ID, self.result))
+            
+            # place back in the clipboard
+            self.clipboard_instance.clipboard_set(self.result)
+            # logging.Debux("VTN start 2 %s" %repr(ignore_data))
+            
+        return ""
+
+class vocola_first_unknown(vocola_interfaces):
+    def __init__(self):
+        vocola_interfaces.__init__()
+        self.ID = "V1stU"
         
+    def action(self):
+        if self.clipboard_string:
+            logging.debug("%s start 1 |%s|" % (self.ID, self.clipboard_string))
+            tn = ToggleName(self.clipboard_string)
+            tn.fix_unknown()
+            self.result = tn.reasemble()
+        return ""
         
+
+
 ### Old tests need to be updated to inlude toggle_tests.py
 def tests():
     
