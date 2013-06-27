@@ -117,85 +117,6 @@ class winclip:
             self.fake_clip=aString
             return True
 
-# vocola interfaces
-# Vocola function: toggle.name, 2-
-def vc_toggle_name(gs2c=1, gcn=0):
-    
-    logging.debug("VTN start 0 %s, %s"%(int(gs2c),int(gcn)))
-    try:
-        clipboard_instance = winclip()  
-        clipboard_string = clipboard_instance.clipboard_get()    
-        logging.debug( "result from clip = |%s|" % clipboard_string)
-        
-        if clipboard_string:
-            logging.debug("Starting ToggleBox: s2c = %s, cn = %s"%(gs2c, gcn))
-            tn = ToggleName(clipboard_string)
-            tn.toggle(s2c=int(gs2c),cn=int(gcn))
-            result = tn.reasemble()
-            logging.debug("parsed component counts: nn=%s, bn=%s, sn=%s, cn=%s"%(tn.get_count())) 
-            
-            # place back in the clipboard
-            clipboard_instance.clipboard_set(result)
-            logging.debug( "toggle result = |%s|" % result)
-            # logging.Debux("VTN start 2 %s" %repr(ignore_data))
-    except Exception, error:
-        logging.debug( "VTN %s" %(repr(error)))
-        traceback_string = traceback.format_exc()
-        logging.debug( "VTN TB %s" % traceback_string)
-
-    return ""
-
-# Vocola function: toggle.unknown
-def vc_fix_unknown():
-    logging.debug("VFU start 0")
-    try:
-        clipboard_instance = winclip()  
-        clipboard_string = clipboard_instance.clipboard_get()    
-        #~ logging.debug( "clip result = |%s|" % clipboard_string)
-        
-        if clipboard_string:
-            logging.debug("VFU start 1 |%s|" % clipboard_string)
-            tn = ToggleName(clipboard_string)
-            tn.toggle(s2c=1,cn=0)
-            #tn.goto_start() #Not needed, fix_unknown() does a test if nessasarry.
-            tn.fix_unknown()
-            result = tn.reasemble()
-            logging.debug( "VFU result = |%s|" % result)
-            
-            # place back in the clipboard
-            clipboard_instance.clipboard_set(result)
-            # logging.Debux("VTN start 2 %s" %repr(ignore_data))
-    except Exception, error:
-        logging.debug( "VFU %s" %(repr(error)))
-        traceback_string = traceback.format_exc()
-        logging.debug( "VFU TB %s" % traceback_string)
-
-    return ""
-
-# Vocola function: toggle.firstunknown
-def vc_first_unknown():
-    logging.debug("VFU start 0")
-    try:
-        clipboard_instance = winclip()  
-        clipboard_string = clipboard_instance.clipboard_get()    
-        #~ logging.debug( "clip result = |%s|" % clipboard_string)
-    except Exception, error:
-        logging.debug( "VFU %s" %(repr(error)))
-        traceback_string = traceback.format_exc()
-        logging.debug( "VFU TB %s" % traceback_string)
-        
-        
-    if clipboard_string:
-        logging.debug("VFU start 1 |%s|" % clipboard_string)
-        tn = ToggleName(clipboard_string)
-        tn.fix_unknown()
-        result = tn.reasemble()
-        
-        # place back in the clipboard
-        clipboard_instance.clipboard_set(result)
-        logging.debug( "result = |%s|" % result)
-        # logging.Debux("VTN start 2 %s" %repr(ignore_data))
-    return ""
 
 class vocola_interface:
     def __init__(self):
@@ -208,12 +129,12 @@ class vocola_interface:
     def read_clipboard( self):
         try:
             self.clipboard_instance = winclip()  
-            self.clipboard_string = clipboard_instance.clipboard_get()    
-            #~ logging.debug( "clip result = |%s|" % clipboard_string)
+            self.clipboard_string = self.clipboard_instance.clipboard_get()    
+            logging.debug( "clip result = |%s|" % self.clipboard_string)
         except Exception, error:
             logging.debug( "%s %s" %(self.ID, repr(error)))
             traceback_string = traceback.format_exc()
-            logging.debug( "$s TB %s" % (self.ID, traceback_string))
+            logging.debug( "%s TB %s" % (self.ID, traceback_string))
         
     def write_clipboard (self, result):
         # place back in the clipboard
@@ -229,9 +150,9 @@ class vocola_interface:
         self.result = self.clipboard_string 
         return ""
     
-class vocola_toggle_name(vocola_interfaces):
+class vocola_toggle_name(vocola_interface):
     def __init__(self):
-        vocola_interfaces.__init__()
+        vocola_interface.__init__(self)
         self.ID = "VTN"
         
     def action(self, gs2c=1, gcn=0):
@@ -239,19 +160,19 @@ class vocola_toggle_name(vocola_interfaces):
             logging.debug("Starting ToggleBox: s2c = %s, cn = %s"%(gs2c, gcn))
             tn = ToggleName(self.clipboard_string)
             tn.toggle(s2c=int(gs2c),cn=int(gcn))
-            result = tn.reasemble()
-            logging.debug("%s: parsed component counts: nn=%s, bn=%s, sn=%s, cn=%s"%(self.ID, tn.get_count())) 
+            self.result = tn.reasemble()
+            #~ logging.debug("%s: parsed component counts: nn=%s, bn=%s, sn=%s, cn=%s"%(self.ID, tn.get_count())) 
             
             # place back in the clipboard
-            clipboard_instance.clipboard_set(self.result)
+            self.clipboard_instance.clipboard_set(self.result)
             logging.debug( "toggle result = |%s|" % self.result)
             # logging.Debux("VTN start 2 %s" %repr(ignore_data))
 
         return ""
 
-class vocola_fix_unknown(vocola_interfaces):
+class vocola_fix_unknown(vocola_interface):
     def __init__(self):
-        vocola_interfaces.__init__()
+        vocola_interface.__init__(self)
         self.ID = "VFXU"
         
     def action(self, gs2c=1, gcn=0):
@@ -270,9 +191,9 @@ class vocola_fix_unknown(vocola_interfaces):
             
         return ""
 
-class vocola_first_unknown(vocola_interfaces):
+class vocola_first_unknown(vocola_interface):
     def __init__(self):
-        vocola_interfaces.__init__()
+        vocola_interface.__init__(self)
         self.ID = "V1stU"
         
     def action(self):
@@ -284,7 +205,25 @@ class vocola_first_unknown(vocola_interfaces):
         return ""
         
 
+# vocola interfaces
+# Vocola function: toggle.name, 2-
+def vc_toggle_name(gs2c=1, gcn=0):
+    interface = vocola_toggle_name()
+    interface.read_clipboard()
+    interface.action(gs2c, gcn)
 
+# Vocola function: toggle.unknown 
+def vc_fix_unknown():
+    interface = vocola_fix_unknown()
+    interface.read_clipboard()
+    interface.action()
+
+# Vocola function: toggle.firstunknown
+def vc_first_unknown():
+    interface = vocola_first_unknown()
+    interface.read_clipboard()
+    interface.action()
+    
 ### Old tests need to be updated to inlude toggle_tests.py
 def tests():
     
@@ -334,9 +273,11 @@ if '__main__'==__name__ :
 
     elif mode == "cf": 
         vc_fix_unknown()
-
-    elif mode == "st": 
-        stdio_toggle_name() # no such things    
-        
-    elif mode == "sm": 
-        stdio_match_name()    
+    else:
+        print("Wat, wrong arg given")
+#~ 
+    #~ elif mode == "st": 
+        #~ stdio_toggle_name() # no such things    
+        #~ 
+    #~ elif mode == "sm": 
+        #~ stdio_match_name()    
