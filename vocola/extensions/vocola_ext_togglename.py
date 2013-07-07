@@ -164,8 +164,7 @@ class vocola_toggle_name(vocola_interface):
             #~ logging.debug("%s: parsed component counts: nn=%s, bn=%s, sn=%s, cn=%s"%(self.ID, tn.get_count())) 
             
             # place back in the clipboard
-            self.clipboard_instance.clipboard_set(self.result)
-            logging.debug( "toggle result = |%s|" % self.result)
+            self.write_clipboard(self.result)
             # logging.Debux("VTN start 2 %s" %repr(ignore_data))
 
         return ""
@@ -186,7 +185,7 @@ class vocola_fix_unknown(vocola_interface):
             logging.debug( "%s result = |%s|" % (self.ID, self.result))
             
             # place back in the clipboard
-            self.clipboard_instance.clipboard_set(self.result)
+            self.write_clipboard(self.result)
             # logging.Debux("VTN start 2 %s" %repr(ignore_data))
             
         return ""
@@ -202,6 +201,9 @@ class vocola_first_unknown(vocola_interface):
             tn = ToggleName(self.clipboard_string)
             tn.fix_unknown()
             self.result = tn.reasemble()
+            
+            # place back in the clipboard
+            self.write_clipboard(self.result)
         return ""
         
 
