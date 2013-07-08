@@ -53,14 +53,9 @@ right   (character={ctrl+f}|
 #
 ### Toggle name commands
 
-savemp():= {ctrl+x}r{space}z
-           {ctrl+x}{ctrl+x}
-           {ctrl+x}r{space}a;
+savemp():= {ctrl+x}r{space}z{ctrl+x}{ctrl+x}{ctrl+x}r{space}a;
 
-restoremp() := {esc}xlist-registers{enter}
-	       {ctrl+x}rjz
-               {ctrl+@}
-               {ctrl+x}rja;
+restoremp() := {ctrl+x}rjz{ctrl+@}{ctrl+x}rja;
 
 restore mark and point = restoremp();
 
@@ -122,17 +117,15 @@ toggle (definition|method) = {esc}xpy-kill-def{enter}
 	      tncleanup()
 	      ;
 
-(fix|fixed) next =    restoremp()
+# only make on extension call.  region management gets too confusing
+(fix|fixed) next = {esc}xlist-registers{enter}
+		 restoremp()
               {ctrl+w} 
               Wait(0)
-	      toggle.name(1,0)
-	      # still have valid cut paste buffer
-              toggle.unknown() # preps next unknown
-	      {ctrl+y}
-	      savemp() 
-              {ctrl+w} # preps for embedded yank; searching for cursor 
+	      toggle.unknown()
 	      tncleanup()
 	      ;
+
 
 (fix|fixed) unknown = {ctrl+a}{ctrl+@}{ctrl+e}
               {ctrl+w} 
