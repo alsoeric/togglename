@@ -43,13 +43,13 @@ def commandline():
     """process commandline"""
         
     # get user data from command line
-    component_list = []
+    component_list = [] # rubbish? :S
 
     usage = "I'm sorry Dave, I can't do that."
     parser = OptionParser(usage)
   
     parser.add_option("-m", type="string", dest='operational_mode',
-        default = "st",
+        default = "st", 
         help="""Choose c[t|f|r] for clipboard, s[t|f|r] for stdin, t = test
         t - toggle
         f - fixunknown
@@ -123,6 +123,7 @@ class vocola_interface:
         self.ID = "VI"
         self.clipboard_instance = None
         self.clipboard_string = ""
+        self.stdin_string = ""
         self.result = ""
         self.tn = None
     
@@ -133,15 +134,32 @@ class vocola_interface:
             logging.debug( "%s clip result = |%s|" % (self.ID, self.clipboard_string))
             self.tn = ToggleName(self.clipboard_string)
         except Exception, error:
-            logging.debug( "%s %s" %(self.ID, repr(error)))
+            logging.debug( "CLIP: %s %s" %(self.ID, repr(error)))
             traceback_string = traceback.format_exc()
             logging.debug( "%s TB %s" % (self.ID, traceback_string))
         
     def write_clipboard (self):
-        # reassemble and place back in the clipboard
+        self._reasemble()
+        self.clipboard_instance.clipboard_set(self.result)
+
+    def read_stdin(self):
+        try:
+            self.stdin_string = sys.stdin_instance.read()
+            logging.debug( "%s stdin result = |%s|" % (self.ID, self.working_string))
+            self.tn = ToggleName(self.stdin_string)
+        except Exception, error:
+            logging.debug( "STDIN:%s %s" %(self.ID, repr(error)))
+            traceback_string = traceback.format_exc()
+            logging.debug( "%s TB %s" % (self.ID, traceback_string))
+            
+    def write_stdout(self):
+        self._reasemble()
+        sys.stdout.write(self.result)
+
+    def _reasemble(self):
+        # reassemble and log
         self.result = self.tn.reasemble()
         logging.debug("%s result = |%s|" % (self.ID, self.result))
-        self.clipboard_instance.clipboard_set(self.result)
 
     def action(self, gs2c=1, gcn=0): 
 
@@ -151,6 +169,8 @@ class vocola_interface:
 
         self.result = self.clipboard_string 
     
+
+
 class vocola_toggle_name(vocola_interface):
     def __init__(self):
         vocola_interface.__init__(self)
@@ -217,6 +237,37 @@ def vc_first_unknown():
     # place back in the clipboard
     interface.write_clipboard()
     return ""
+
+
+# STDIN functions: 
+def stdin_toggle_name(gs2c=1, gcn=0):
+    interface = vocola_toggle_name()
+    interface.read_stdin()
+    interface.action(gs2c, gcn)
+
+    # write to stdout
+    interface.write_stdout()
+    return ""
+
+# Vocola function: toggle.unknown 
+def stdin_fix_unknown():
+    interface = vocola_fix_unknown()
+    interface.read_stdin()
+    interface.action()
+
+    # write to stdout
+    interface.write_stdout()
+    return ""
+
+# Vocola function: toggle.firstunknown
+def stdin_first_unknown():
+    interface = vocola_first_unknown()
+    interface.read_stdin()
+    interface.action()
+
+    # write to stdout
+    interface.write_stdout()
+    return ""
     
 ### Old tests need to be updated to include toggle_tests.py
 def tests():
@@ -267,11 +318,15 @@ if '__main__'==__name__ :
 
     elif mode == "cf": 
         vc_fix_unknown()
+
+    elif mode == "st":
+        stdin_toggle_name(True, cn)
+ 
+    elif mode == "sr": 
+        stdin_toggle_name(False, tn)     
+         
+    elif mode == "sf": 
+        stdin_fix_unknown()
+
     else:
-        print("Wat, wrong arg given")
-#~ 
-    #~ elif mode == "st": 
-        #~ stdio_toggle_name() # no such things    
-        #~ 
-    #~ elif mode == "sm": 
-        #~ stdio_match_name()    
+        raise hell #Wrong argumetns were added. Nothing will happen, better do something?
