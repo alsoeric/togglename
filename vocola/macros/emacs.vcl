@@ -19,7 +19,7 @@ search (forward={ctrl+s}|back={ctrl+r}) = $1;
 yank (again={Esc}y|it back={ctrl+y}) = $1;
 go to line = {Alt+g};
 repeat (it={ctrl+u} | twice={ctrl+u2} | thrice={ctrl+u3} ) = $1;
-leave mark = {ctrl+@};
+leave mark = {ctrl+shift+2};
 
 copy    (character={esc}xdelete-forward-char{enter}{ctrl+y} | 
          word= {esc}d{ctrl+y}|
@@ -49,43 +49,39 @@ right   (character={ctrl+f}|
 
 # python extensions might be things like "change comments| sentence | word | paragraph".  
 
-
 #
 ### Toggle name commands
 
-savemp():= {ctrl+x}r{space}z
-           {ctrl+x}{ctrl+x}
-           {ctrl+x}r{space}a;
+savemp():= {ctrl+x}r{space}z{ctrl+x}{ctrl+x}{ctrl+x}r{space}a;
 
-restoremp() := {esc}xlist-registers{enter}
-	       {ctrl+x}rjz
-               {ctrl+@}
-               {ctrl+x}rja;
+restoremp() := {ctrl+x}rjz{ctrl+shift+2}{ctrl+x}rja;
 
 restore mark and point = restoremp();
 
-tncleanup() := {ctrl+y}
-               {ctrl+x}{ctrl+x}
-               {ctrl+s}{ctrl+q}{ctrl+a} # search forward for cursor marker
-               {ctrl+@}{backspace};
+tncleanup() := (yank)(exchange-point-and-mark)
+	       # search forward for cursor marker
+	       (search-forward "\C-a")(delete-backward-char)
+                ;
 
 use this region = savemp();
 
 toggle name = {ctrl+q}{ctrl+a} # insert cusror marker
-              {ctrl+a}{ctrl+@}{ctrl+e}{ctrl+w} # grab line 
+              {ctrl+a}{ctrl+shift+2}{ctrl+e}{ctrl+w} # grab line 
               Wait(0) # wait to flush character queue
               toggle.name(1,1) # string to code, need cursor marker
 	      {ctrl+y}
               # move point to end of symbol and ^a
 	      {ctrl+a}
 	      {ctrl+s} # look for cursor
-	      {ctrl+q}{ctrl+a}{ctrl+@}{backspace};
+	      {ctrl+q}{ctrl+a}{ctrl+shift+2}{backspace};
 
 	      # CLIPSAVE()/CLIPRESTORE();b
 
 toggle statement = {esc}xpy-kill-statement{enter}
               Wait(0)
-              toggle.name(1,0) 
+              toggle.name(1,0)
+	      {esc}xtoggle-post{enter}
+ 
 	      {ctrl+y}
               savemp();
 	      # CLIPSAVE()/CLIPRESTORE();
@@ -122,24 +118,22 @@ toggle (definition|method) = {esc}xpy-kill-def{enter}
 	      tncleanup()
 	      ;
 
-(fix|fixed) next =    restoremp()
+# only make on extension call.  region management gets too confusing
+(fix|fixed) next = {esc}xlist-registers{enter}
+		 restoremp()
               {ctrl+w} 
               Wait(0)
-	      toggle.name(1,0)
-	      # still have valid cut paste buffer
-              toggle.unknown() # preps next unknown
-	      {ctrl+y}
-	      savemp() 
-              {ctrl+w} # preps for embedded yank; searching for cursor 
+	      toggle.unknown()
 	      tncleanup()
 	      ;
 
-(fix|fixed) unknown = {ctrl+a}{ctrl+@}{ctrl+e}
-              {ctrl+w} 
+(fix|fixed) unknown = {ctrl+a}{ctrl+shift+2}{ctrl+e}
+              {ctrl+w}
               Wait(0)
     	      toggle.firstunknown()
 	      tncleanup()
 	      ;
+
 
 
 ### 
