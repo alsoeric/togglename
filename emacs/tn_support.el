@@ -1,6 +1,6 @@
 ;; support file for toggle name functions when interacting with Emacs environment.
 
-(tncleanup (
+(defun tncleanup (
 	    (yank)
 	    (exchange-point-and-mark)
 	    ;; search forward for cursor marker
@@ -9,10 +9,9 @@
 	    )
 )
 
-(Toggle-statement (
-		       (py-kill-statement)
-		       (shell-command "tnshell -mt"
-		       )
+(defun toggle-statement (
+			 (py-kill-statement)
+			 (shell-command "tnshell -mt")
               toggle.name(1,0) 
 	      {ctrl+y}
               savemp();
