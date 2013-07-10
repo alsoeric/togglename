@@ -1,12 +1,11 @@
 ;; support file for toggle name functions when interacting with Emacs environment.
 
 (defun tncleanup (
-	    (yank)
-	    (exchange-point-and-mark)
-	    ;; search forward for cursor marker
-	    (search-forward "\C-a")
-	    (delete-backward-char)
-	    )
+		  (exchange-point-and-mark)
+		  ;; search forward for cursor marker
+		  (search-forward "\C-a")
+		  (delete-backward-char 1)
+		  )
 )
 
 (defun toggle-statement (
