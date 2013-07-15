@@ -1,4 +1,10 @@
-;; support file for toggle name functions when interacting with Emacs environment.
+;; support file for toggle name functions when interacting with Emacs environmen
+t.
+
+savemp():= {ctrl+x}r{space}z{ctrl+x}{ctrl+x}{ctrl+x}r{space}a;
+
+restoremp() := {ctrl+x}rjz{ctrl+shift+2}{ctrl+x}rja;
+
 
 (defun tncleanup (
 		  (exchange-point-and-mark)
@@ -8,16 +14,15 @@
 		  )
 )
 
-(defun toggle-statement (
-			 (py-kill-statement)
-			 (shell-command "tnshell -mt")
-              toggle.name(1,0) 
-	      {ctrl+y}
-              savemp();
-	      # CLIPSAVE()/CLIPRESTORE();
-
-tn_support.el
-tn_support.el~
-(shell-command "ls" t)tn_support.el
-tn_support.el~
-
+(defun toggle-statement-pre (
+			     (py-kill-statement)
+			     (yank)  ;; define region
+			     ;;(narrow-to-region    
+			     ;; (region-beginning) 
+			     ;; (region-end))
+			     ;; ends here for return to vocola
+			     ;; toggle.name(1,0) 
+(defun toggle-statement-post (
+			      (exchange-point-and-mark)
+			      (yank) ;; overwrites active region
+			      (exchange-point-and-mark) ;; activate it again
