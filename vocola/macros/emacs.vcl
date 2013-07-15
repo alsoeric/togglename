@@ -58,10 +58,10 @@ restoremp() := {ctrl+x}rjz{ctrl+shift+2}{ctrl+x}rja;
 
 restore mark and point = restoremp();
 
-tncleanup() := (yank)(exchange-point-and-mark)
-	       # search forward for cursor marker
-	       (search-forward "\C-a")(delete-backward-char)
-                ;
+#tncleanup() := (yank)(exchange-point-and-mark)
+#	       # search forward for cursor marker
+#	       (search-forward "\C-a")(delete-backward-char)
+#                ;
 
 use this region = savemp();
 
@@ -77,14 +77,12 @@ toggle name = {ctrl+q}{ctrl+a} # insert cusror marker
 
 	      # CLIPSAVE()/CLIPRESTORE();b
 
-toggle statement = {esc}xpy-kill-statement{enter}
+toggle statement = {esc}:"(toggle-statement-pre)"{enter}
               Wait(0)
               toggle.name(1,0)
-	      {esc}xtoggle-post{enter}
- 
-	      {ctrl+y}
-              savemp();
-	      # CLIPSAVE()/CLIPRESTORE();
+	      {esc}:"(toggle-statement-post)"{enter}
+	      # CLIPSAVE()/CLIPRESTORE()
+	      ;
 
 
 # py-kill-expression
@@ -115,7 +113,7 @@ toggle (definition|method) = {esc}xpy-kill-def{enter}
               Wait(0)
               # fix names and move to next unknown
               toggle.firstunknown() 
-	      tncleanup()
+	      #tncleanup()
 	      ;
 
 # only make on extension call.  region management gets too confusing
@@ -124,14 +122,14 @@ toggle (definition|method) = {esc}xpy-kill-def{enter}
               {ctrl+w} 
               Wait(0)
 	      toggle.unknown()
-	      tncleanup()
+	      #tncleanup()
 	      ;
 
 (fix|fixed) unknown = {ctrl+a}{ctrl+shift+2}{ctrl+e}
               {ctrl+w}
               Wait(0)
     	      toggle.firstunknown()
-	      tncleanup()
+	      #tncleanup()
 	      ;
 
 
