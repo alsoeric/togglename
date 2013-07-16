@@ -121,6 +121,9 @@ toggle (definition|method) = {esc}:"(toggle-def-pre)"{enter}
 	      {esc}:"(fix-cleanup)"{enter}
 	      ;
 
+all done = {esc}xwiden{enter}
+	      ;
+
 
 
 ### 

@@ -1,10 +1,5 @@
 ;; support file for toggle name functions when interacting with Emacs environment.
 
-;; savemp():= {ctrl+x}r{space}z{ctrl+x}{ctrl+x}{ctrl+x}r{space}a;
-
-;; restoremp() := {ctrl+x}rjz{ctrl+shift+2}{ctrl+x}rja;
-
-
 
 (defun toggle-name-pre()
   "follow with toggle-name-post"
@@ -63,6 +58,6 @@
    (yank)
    ;; search forward for cursor marker
    (beginning-of-buffer)
-   (search-forward "\C-a")
+   (search-forward "\C-a" nil t)
    (delete-backward-char 1)		  
    )
