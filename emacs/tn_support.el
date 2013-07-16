@@ -8,7 +8,7 @@
 
 (defun toggle-name-pre()
   "follow with toggle-name-post"
-  (insert C-a)
+  (insert "\C-a")
   (kill-whole-line)
   )
 
@@ -29,15 +29,10 @@
   (py-kill-statement)
   )
 
-(defun toggle-post () 
-  ""
-   (exchange-point-and-mark)
-   (yank) ;; overwrites active region ??
-   (narrow-to-region    
-    (region-beginning) 
-    (region-end)
-    )
-   )
+(defun toggle-expression-pre () 
+  "follow with toggle-post"
+  (py-kill-expression)
+  )
 
 (defun toggle-class-pre () 
   "follow with toggle-post"
@@ -49,11 +44,20 @@
   (py-kill-def)
   )
 
+(defun toggle-post () 
+  ""
+   (yank) ;; overwrites active region ??
+   (narrow-to-region    
+    (region-begin) 
+    (region-end)
+    )
+   )
+
 (defun fix-pre ()
   "common fix code. works in narrowed region"
-  (mark-whole-buffer)
-  (kill-region)
+  (kill-region (point-min) (point-max))
   )
+
 (defun fix-cleanup ()
    ""
    (yank)
