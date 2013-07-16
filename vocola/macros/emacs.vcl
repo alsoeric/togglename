@@ -65,71 +65,60 @@ restore mark and point = restoremp();
 
 use this region = savemp();
 
-toggle name = {ctrl+q}{ctrl+a} # insert cusror marker
-              {ctrl+a}{ctrl+shift+2}{ctrl+e}{ctrl+w} # grab line 
+toggle name = {esc}:"(toggle-name-pre)"{enter}
               Wait(0) # wait to flush character queue
               toggle.name(1,1) # string to code, need cursor marker
-	      {ctrl+y}
-              # move point to end of symbol and ^a
-	      {ctrl+a}
-	      {ctrl+s} # look for cursor
-	      {ctrl+q}{ctrl+a}{ctrl+shift+2}{backspace};
-
-	      # CLIPSAVE()/CLIPRESTORE();b
+	      {esc}:"(toggle-name-post)"{enter}
+	      # CLIPSAVE()/CLIPRESTORE()
+	      ;
 
 toggle statement = {esc}:"(toggle-statement-pre)"{enter}
               Wait(0)
               toggle.name(1,0)
-	      {esc}:"(toggle-statement-post)"{enter}
+	      {esc}:"(toggle-post)"{enter}
+	      # CLIPSAVE()/CLIPRESTORE()
+	      ;
+
+toggle expression = {esc}:"(toggle-expression-pre)"{enter}
+              Wait(0)
+              toggle.name(1,0) 
+	      {esc}:"(toggle-post)"{enter}
+	      # CLIPSAVE()/CLIPRESTORE()
+	      ;
+
+toggle class = {esc}:"(toggle-class-pre)"{enter}
+              Wait(0)
+              toggle.name(1,0) 
+	      {esc}:"(toggle-post)"{enter}
+	      # CLIPSAVE()/CLIPRESTORE()
+	      ;
+
+toggle (definition|method) = {esc}:"(toggle-def-pre)"{enter}
+              Wait(0)
+              toggle.name(1,0) 
+	      {esc}:"(toggle-post)"{enter}
 	      # CLIPSAVE()/CLIPRESTORE()
 	      ;
 
 
-# py-kill-expression
-toggle expression = {esc}xpy-kill-expression{enter}
-              Wait(0)
-              toggle.name(1,0) 
-	      {ctrl+y}
-              savemp();
-	      # CLIPSAVE()/CLIPRESTORE();
-
-toggle class = {esc}xpy-kill-class{enter}
-              Wait(0)
-              toggle.name(1,0) 
-	      {ctrl+y}
-              savemp()
-              ;
-
-toggle (definition|method) = {esc}xpy-kill-def{enter}
-              Wait(0)
-              toggle.name(1,0) 
-	      {ctrl+y}
-              savemp()
-              ;
-
-
-(fix|fixed) region =  restoremp()
-              {ctrl+w} 
+(fix|fixed) region = {esc}:"(fix-pre)"{enter}
               Wait(0)
               # fix names and move to next unknown
               toggle.firstunknown() 
-	      #tncleanup()
+	      {esc}:"(fix-cleanup)"{enter}
 	      ;
 
 # only make on extension call.  region management gets too confusing
-(fix|fixed) next = {esc}xlist-registers{enter}
-		 restoremp()
-              {ctrl+w} 
+(fix|fixed) next = {esc}:"(fix-pre)"{enter}
               Wait(0)
-	      toggle.unknown()
-	      #tncleanup()
+	      toggle.fix_unknown()
+	      {esc}:"(fix-cleanup)"{enter}
 	      ;
 
-(fix|fixed) unknown = {ctrl+a}{ctrl+shift+2}{ctrl+e}
-              {ctrl+w}
+(fix|fixed) unknown = {esc}:"(fix-pre)"{enter}
               Wait(0)
     	      toggle.firstunknown()
-	      #tncleanup()
+	      {esc}:"(fix-cleanup)"{enter}
 	      ;
 
 

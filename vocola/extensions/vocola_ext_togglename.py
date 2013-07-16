@@ -218,7 +218,7 @@ def vc_toggle_name(gs2c=1, gcn=0):
     interface.write_clipboard()
     return ""
 
-# Vocola function: toggle.unknown 
+# Vocola function: toggle.fix_unknown 
 def vc_fix_unknown():
     interface = vocola_fix_unknown()
     interface.read_clipboard()
@@ -249,7 +249,6 @@ def stdin_toggle_name(gs2c=1, gcn=0):
     interface.write_stdout()
     return ""
 
-# Vocola function: toggle.unknown 
 def stdin_fix_unknown():
     interface = vocola_fix_unknown()
     interface.read_stdin()
@@ -259,7 +258,6 @@ def stdin_fix_unknown():
     interface.write_stdout()
     return ""
 
-# Vocola function: toggle.firstunknown
 def stdin_first_unknown():
     interface = vocola_first_unknown()
     interface.read_stdin()
