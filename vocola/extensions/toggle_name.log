@@ -1,0 +1,212 @@
+2013-05-26 20:50:47,006 - DEBUG - ------------ start of tn.py run ------------------
+2013-05-26 20:50:47,107 - DEBUG - SQL key look up with val |smplStr|: |None|
+2013-05-26 20:50:47,164 - DEBUG - SQL key look up with val |defnot_go|: |None|
+2013-05-26 20:50:47,223 - DEBUG - SQL key look up with val |smplCntr|: |None|
+2013-05-26 20:50:47,282 - DEBUG - SQL key look up with val |VsmplCntr|: |None|
+2013-05-26 20:50:47,338 - DEBUG - SQL key look up with val |aplpie|: |None|
+2013-05-26 20:50:47,398 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-26 20:50:47,401 - DEBUG - SQL key look up with val |aplpie|: |apple pie|
+2013-05-26 20:50:47,405 - DEBUG - SQL key look up with val |aplpie|: |apple pie|
+2013-05-26 20:50:47,413 - DEBUG - SQL key look up with val |aplpie|: |apple pie|
+2013-05-26 20:50:47,417 - DEBUG - SQL key look up with val |aplpie|: |apple pie|
+2013-05-26 20:50:47,421 - DEBUG - SQL key look up with val |aplpie|: |apple pie|
+2013-05-26 20:50:47,426 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-26 20:50:47,431 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-26 20:50:47,437 - DEBUG - SQL val look up with key |bang bang|: |None|
+2013-05-26 20:50:47,438 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-26 20:50:47,440 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-26 20:50:47,440 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-26 20:50:47,447 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-26 20:50:47,448 - DEBUG - SQL val look up with key |defnot go|: |defnot_go|
+2013-05-26 20:50:47,450 - DEBUG - SQL val look up with key |very simple counter|: |VsmplCntr|
+2013-05-26 20:50:47,457 - DEBUG - SQL val look up with key |very simple counter|: |VsmplCntr|
+2013-05-26 20:50:47,463 - DEBUG - SQL val look up with key |very simple counter|: |VsmplCntr|
+2013-05-26 20:50:47,471 - DEBUG - SQL val look up with key |simple counter|: |smplCntr|
+2013-05-26 20:50:47,476 - DEBUG - SQL val look up with key |simple string|: |smplStr|
+2013-05-26 20:50:47,487 - DEBUG - SQL val look up with key |simple string|: |smplStr|
+2013-05-26 20:50:47,500 - DEBUG - SQL val look up with key |simple string|: |smplStr|
+2013-05-26 20:50:47,510 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-26 20:50:47,512 - DEBUG - SQL val look up with key |indeed so|: |None|
+2013-05-26 20:50:47,525 - DEBUG - SQL val look up with key |simple string|: |smplStr|
+2013-05-26 20:50:47,526 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-26 20:50:47,526 - DEBUG - SQL val look up with key |simple string 1234|: |None|
+2013-05-26 20:50:47,535 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-26 20:50:47,536 - DEBUG - SQL key look up with val |codename|: |None|
+2013-05-26 20:50:47,538 - DEBUG - SQL key look up with val |aplpie|: |apple pie|
+2013-05-26 20:50:47,539 - DEBUG - SQL val look up with key |string name|: |None|
+2013-05-26 20:50:47,546 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-26 20:50:47,549 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-26 20:50:47,552 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-26 20:50:47,552 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-26 20:50:47,552 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-26 20:50:47,553 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-26 20:50:47,555 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-26 20:50:47,561 - DEBUG - SQL val look up with key |Recursive add|: |None|
+2013-05-26 20:50:47,562 - DEBUG - SQL val look up with key |Great big some|: |None|
+2013-05-26 20:50:47,562 - DEBUG - SQL val look up with key |great big some plus digit|: |None|
+2013-05-26 20:50:47,562 - DEBUG - SQL val look up with key |great big some|: |None|
+2013-05-26 20:50:47,563 - DEBUG - SQL val look up with key |Recursive add|: |None|
+2013-05-26 20:50:47,565 - DEBUG - SQL val look up with key |great big some|: |None|
+2013-05-26 20:50:47,565 - DEBUG - SQL val look up with key |great big some|: |None|
+2013-05-26 21:53:20,256 - DEBUG - ------------ start of tn.py run ------------------
+2013-05-26 21:54:44,933 - DEBUG - SQL val look up with key |Foo bar man|: |None|
+2013-05-26 21:54:44,934 - DEBUG - SQL val look up with key |car pig|: |None|
+2013-05-26 21:54:44,934 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-26 21:55:43,713 - DEBUG - ------------ start of tn.py run ------------------
+2013-05-26 21:55:48,851 - DEBUG - SQL val look up with key |Foo bar man|: |None|
+2013-05-26 21:55:48,852 - DEBUG - SQL val look up with key |car pig|: |None|
+2013-05-26 21:55:48,854 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:14:46,211 - DEBUG - ------------ start of tn.py run ------------------
+2013-05-27 03:14:46,273 - DEBUG - SQL key look up with val |smplStr|: |simple string|
+2013-05-27 03:14:46,563 - DEBUG - SQL key look up with val |defnot_go|: |defnot go|
+2013-05-27 03:14:46,812 - DEBUG - SQL key look up with val |smplCntr|: |simple counter|
+2013-05-27 03:14:47,026 - DEBUG - SQL key look up with val |VsmplCntr|: |very simple counter|
+2013-05-27 03:14:47,285 - DEBUG - SQL key look up with val |aplpie|: |apple pie|
+2013-05-27 03:14:47,434 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:14:47,438 - DEBUG - SQL key look up with val |aplpie|: |apple pie|
+2013-05-27 03:14:47,441 - DEBUG - SQL key look up with val |aplpie|: |apple pie|
+2013-05-27 03:14:47,448 - DEBUG - SQL key look up with val |aplpie|: |apple pie|
+2013-05-27 03:14:47,457 - DEBUG - SQL key look up with val |aplpie|: |apple pie|
+2013-05-27 03:14:47,466 - DEBUG - SQL key look up with val |aplpie|: |apple pie|
+2013-05-27 03:14:47,467 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:14:47,473 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:14:47,480 - DEBUG - SQL val look up with key |bang bang|: |None|
+2013-05-27 03:14:47,482 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:14:47,483 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:14:47,483 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:14:47,492 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:14:47,493 - DEBUG - SQL val look up with key |defnot go|: |defnot_go|
+2013-05-27 03:14:47,493 - DEBUG - SQL val look up with key |very simple counter|: |VsmplCntr|
+2013-05-27 03:14:47,500 - DEBUG - SQL val look up with key |very simple counter|: |VsmplCntr|
+2013-05-27 03:14:47,506 - DEBUG - SQL val look up with key |very simple counter|: |VsmplCntr|
+2013-05-27 03:14:47,515 - DEBUG - SQL val look up with key |simple counter|: |smplCntr|
+2013-05-27 03:14:47,520 - DEBUG - SQL val look up with key |simple string|: |smplStr|
+2013-05-27 03:14:47,532 - DEBUG - SQL val look up with key |simple string|: |smplStr|
+2013-05-27 03:14:47,539 - DEBUG - SQL val look up with key |simple string|: |smplStr|
+2013-05-27 03:14:47,552 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:14:47,552 - DEBUG - SQL val look up with key |indeed so|: |None|
+2013-05-27 03:14:47,566 - DEBUG - SQL val look up with key |simple string|: |smplStr|
+2013-05-27 03:14:47,568 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:14:47,569 - DEBUG - SQL val look up with key |simple string 1234|: |None|
+2013-05-27 03:14:47,572 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:14:47,572 - DEBUG - SQL key look up with val |codename|: |None|
+2013-05-27 03:14:47,573 - DEBUG - SQL key look up with val |aplpie|: |apple pie|
+2013-05-27 03:14:47,575 - DEBUG - SQL val look up with key |string name|: |None|
+2013-05-27 03:14:47,578 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:14:47,579 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:14:47,582 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:14:47,584 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:14:47,585 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:14:47,585 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:14:47,585 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:14:47,588 - DEBUG - SQL val look up with key |Recursive add|: |None|
+2013-05-27 03:14:47,589 - DEBUG - SQL val look up with key |Great big some|: |None|
+2013-05-27 03:14:47,591 - DEBUG - SQL val look up with key |great big some plus digit|: |None|
+2013-05-27 03:14:47,591 - DEBUG - SQL val look up with key |great big some|: |None|
+2013-05-27 03:14:47,592 - DEBUG - SQL val look up with key |Recursive add|: |None|
+2013-05-27 03:14:47,592 - DEBUG - SQL val look up with key |great big some|: |None|
+2013-05-27 03:14:47,594 - DEBUG - SQL val look up with key |great big some|: |None|
+2013-05-27 03:20:12,834 - DEBUG - ------------ start of tn.py run ------------------
+2013-05-27 03:20:12,835 - DEBUG - SQL key look up with val |smplStr|: |simple string|
+2013-05-27 03:20:12,957 - DEBUG - SQL key look up with val |defnot_go|: |defnot go|
+2013-05-27 03:20:13,081 - DEBUG - SQL key look up with val |smplCntr|: |simple counter|
+2013-05-27 03:20:13,213 - DEBUG - SQL key look up with val |VsmplCntr|: |very simple counter|
+2013-05-27 03:20:13,338 - DEBUG - SQL key look up with val |aplpie|: |apple pie|
+2013-05-27 03:20:13,463 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:20:13,466 - DEBUG - SQL key look up with val |aplpie|: |apple pie|
+2013-05-27 03:20:13,467 - DEBUG - SQL key look up with val |aplpie|: |apple pie|
+2013-05-27 03:20:13,470 - DEBUG - SQL key look up with val |aplpie|: |apple pie|
+2013-05-27 03:20:13,470 - DEBUG - SQL key look up with val |aplpie|: |apple pie|
+2013-05-27 03:20:13,473 - DEBUG - SQL key look up with val |aplpie|: |apple pie|
+2013-05-27 03:20:13,473 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:20:13,474 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:20:13,476 - DEBUG - SQL val look up with key |bang bang|: |None|
+2013-05-27 03:20:13,477 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:20:13,479 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:20:13,480 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:20:13,482 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:20:13,483 - DEBUG - SQL val look up with key |defnot go|: |defnot_go|
+2013-05-27 03:20:13,483 - DEBUG - SQL val look up with key |very simple counter|: |VsmplCntr|
+2013-05-27 03:20:13,486 - DEBUG - SQL val look up with key |very simple counter|: |VsmplCntr|
+2013-05-27 03:20:13,486 - DEBUG - SQL val look up with key |very simple counter|: |VsmplCntr|
+2013-05-27 03:20:13,487 - DEBUG - SQL val look up with key |simple counter|: |smplCntr|
+2013-05-27 03:20:13,490 - DEBUG - SQL val look up with key |simple string|: |smplStr|
+2013-05-27 03:20:13,490 - DEBUG - SQL val look up with key |simple string|: |smplStr|
+2013-05-27 03:20:13,493 - DEBUG - SQL val look up with key |simple string|: |smplStr|
+2013-05-27 03:20:13,493 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:20:13,494 - DEBUG - SQL val look up with key |indeed so|: |None|
+2013-05-27 03:20:13,503 - DEBUG - SQL val look up with key |simple string|: |smplStr|
+2013-05-27 03:20:13,506 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:20:13,506 - DEBUG - SQL val look up with key |simple string 1234|: |None|
+2013-05-27 03:20:13,509 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:20:13,510 - DEBUG - SQL key look up with val |codename|: |None|
+2013-05-27 03:20:13,512 - DEBUG - SQL key look up with val |aplpie|: |apple pie|
+2013-05-27 03:20:13,513 - DEBUG - SQL val look up with key |string name|: |None|
+2013-05-27 03:20:13,515 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:20:13,516 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:20:13,519 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:20:13,520 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:20:13,522 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:20:13,522 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:20:13,523 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:20:13,526 - DEBUG - SQL val look up with key |Recursive add|: |None|
+2013-05-27 03:20:13,526 - DEBUG - SQL val look up with key |Great big some|: |None|
+2013-05-27 03:20:13,528 - DEBUG - SQL val look up with key |great big some plus digit|: |None|
+2013-05-27 03:20:13,529 - DEBUG - SQL val look up with key |great big some|: |None|
+2013-05-27 03:20:13,529 - DEBUG - SQL val look up with key |Recursive add|: |None|
+2013-05-27 03:20:13,529 - DEBUG - SQL val look up with key |great big some|: |None|
+2013-05-27 03:20:13,530 - DEBUG - SQL val look up with key |great big some|: |None|
+2013-05-27 03:22:11,877 - DEBUG - ------------ start of tn.py run ------------------
+2013-05-27 03:22:11,878 - DEBUG - SQL key look up with val |smplStr|: |simple string|
+2013-05-27 03:22:12,013 - DEBUG - SQL key look up with val |defnot_go|: |defnot go|
+2013-05-27 03:22:12,171 - DEBUG - SQL key look up with val |smplCntr|: |simple counter|
+2013-05-27 03:22:12,328 - DEBUG - SQL key look up with val |VsmplCntr|: |very simple counter|
+2013-05-27 03:22:12,460 - DEBUG - SQL key look up with val |aplpie|: |apple pie|
+2013-05-27 03:22:12,624 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:22:12,625 - DEBUG - SQL key look up with val |aplpie|: |apple pie|
+2013-05-27 03:22:12,628 - DEBUG - SQL key look up with val |aplpie|: |apple pie|
+2013-05-27 03:22:12,631 - DEBUG - SQL key look up with val |aplpie|: |apple pie|
+2013-05-27 03:22:12,631 - DEBUG - SQL key look up with val |aplpie|: |apple pie|
+2013-05-27 03:22:12,632 - DEBUG - SQL key look up with val |aplpie|: |apple pie|
+2013-05-27 03:22:12,634 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:22:12,634 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:22:12,637 - DEBUG - SQL val look up with key |bang bang|: |None|
+2013-05-27 03:22:12,638 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:22:12,638 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:22:12,641 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:22:12,641 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:22:12,644 - DEBUG - SQL val look up with key |defnot go|: |defnot_go|
+2013-05-27 03:22:12,644 - DEBUG - SQL val look up with key |very simple counter|: |VsmplCntr|
+2013-05-27 03:22:12,645 - DEBUG - SQL val look up with key |very simple counter|: |VsmplCntr|
+2013-05-27 03:22:12,648 - DEBUG - SQL val look up with key |very simple counter|: |VsmplCntr|
+2013-05-27 03:22:12,648 - DEBUG - SQL val look up with key |simple counter|: |smplCntr|
+2013-05-27 03:22:12,651 - DEBUG - SQL val look up with key |simple string|: |smplStr|
+2013-05-27 03:22:12,651 - DEBUG - SQL val look up with key |simple string|: |smplStr|
+2013-05-27 03:22:12,653 - DEBUG - SQL val look up with key |simple string|: |smplStr|
+2013-05-27 03:22:12,654 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:22:12,655 - DEBUG - SQL val look up with key |indeed so|: |None|
+2013-05-27 03:22:12,661 - DEBUG - SQL val look up with key |simple string|: |smplStr|
+2013-05-27 03:22:12,664 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:22:12,664 - DEBUG - SQL val look up with key |simple string 1234|: |None|
+2013-05-27 03:22:12,667 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:22:12,668 - DEBUG - SQL key look up with val |codename|: |None|
+2013-05-27 03:22:12,670 - DEBUG - SQL key look up with val |aplpie|: |apple pie|
+2013-05-27 03:22:12,671 - DEBUG - SQL val look up with key |string name|: |None|
+2013-05-27 03:22:12,673 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:22:12,674 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:22:12,677 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:22:12,678 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:22:12,680 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:22:12,680 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:22:12,681 - DEBUG - SQL val look up with key |apple pie|: |aplpie|
+2013-05-27 03:22:12,684 - DEBUG - SQL val look up with key |Recursive add|: |None|
+2013-05-27 03:22:12,686 - DEBUG - SQL val look up with key |Great big some|: |None|
+2013-05-27 03:22:12,686 - DEBUG - SQL val look up with key |great big some plus digit|: |None|
+2013-05-27 03:22:12,687 - DEBUG - SQL val look up with key |great big some|: |None|
+2013-05-27 03:22:12,687 - DEBUG - SQL val look up with key |Recursive add|: |None|
+2013-05-27 03:22:12,687 - DEBUG - SQL val look up with key |great big some|: |None|
+2013-05-27 03:22:12,688 - DEBUG - SQL val look up with key |great big some|: |None|
+2013-05-27 08:23:30,446 - DEBUG - ------------ start of tn.py run ------------------
+2013-05-27 08:24:15,974 - DEBUG - SQL val look up with key |Recyrsuve add|: |None|
+2013-05-27 08:25:01,328 - DEBUG - ------------ start of tn.py run ------------------
+2013-05-27 08:25:05,806 - DEBUG - SQL val look up with key |Recyrsuve add|: |None|
