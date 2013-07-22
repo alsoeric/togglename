@@ -513,7 +513,7 @@ class bang_name(component_Parent):
         # store data in dictionary hidden inside an SQLlite database
         #What happends in the case of "  !!cod_name" ? should do testing
         str_name , cod_name = self.data.split("!!")
-        
+        str_name = str_name.lower()
         if "" in (str_name, cod_name):
             return self
         

@@ -1,6 +1,14 @@
 ;; support file for toggle name functions when interacting with Emacs environment.
 
 
+(defun use-this-region-pre()
+  "follow with toggle-name-post"
+  (kill-region
+   (region-beginning) 
+   (region-end)
+   )
+  )
+
 (defun toggle-name-pre()
   "follow with toggle-name-post"
   (insert "\C-a")
@@ -43,7 +51,7 @@
   ""
    (yank) ;; overwrites active region ??
    (narrow-to-region    
-    (region-begin) 
+    (region-beginning) 
     (region-end)
     )
    )

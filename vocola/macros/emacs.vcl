@@ -49,6 +49,8 @@ right   (character={ctrl+f}|
 
 # python extensions might be things like "change comments| sentence | word | paragraph".  
 
+Empty triple quotes = {tab}'""" """';
+Empty method definition = ' (self,):'{ctrl+a}{tab}'def ' ;
 #
 ### Toggle name commands
 
@@ -63,7 +65,12 @@ restore mark and point = restoremp();
 #	       (search-forward "\C-a")(delete-backward-char)
 #                ;
 
-use this region = savemp();
+(use this|toggle) region = {esc}:"(use-this-region-pre)"{enter}
+              Wait(0)
+              toggle.name(1,0) 
+	      {esc}:"(toggle-post)"{enter}
+	      ;
+
 
 toggle name = {esc}:"(toggle-name-pre)"{enter}
               Wait(0) # wait to flush character queue
