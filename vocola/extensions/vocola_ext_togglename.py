@@ -12,9 +12,12 @@ from optparse import OptionParser
 import traceback
 import os
 
+clippy_filename = os.path.expanduser("~/tn_clippy.txt")
+
 user_dir = os.environ['USERPROFILE']
 log_path = os.path.abspath(os.path.join(user_dir,'Documents/toggle_name/'))
 log_name = 'toggle_name.log'
+
 if not os.path.exists(log_path):
     os.mkdir(log_path)
 logging.basicConfig(filename=os.path.join(log_path,log_name),
@@ -117,6 +120,29 @@ class winclip:
             self.fake_clip=aString
             return True
 
+class fileclip:
+    def __init__(self):
+        self.fh = None
+        
+    # clipboard access class using file as clipboard
+    def clipboard_wait_open(self,rw="r"):
+        # file does not need to wait.  maybe if we used locking
+        self.fh = open(clippy_filename,rw)
+        
+    def clipboard_get(self):
+        self.clipboard_wait_open("r")   
+        result = self.fh.read()
+        self.fh.close()
+        return result
+
+    def clipboard_set(self,aString):
+        self.clipboard_wait_open("w")
+        self.fh.seek(0)
+        self.fh.truncate()
+        self.fh.write(aString)
+        self.fh.close()
+        return
+
 
 class vocola_interface:
     def __init__(self):
@@ -129,7 +155,7 @@ class vocola_interface:
     
     def read_clipboard( self):
         try:
-            self.clipboard_instance = winclip()  
+            self.clipboard_instance = fileclip()  
             self.clipboard_string = self.clipboard_instance.clipboard_get()    
             logging.debug( "%s clip result = |%s|" % (self.ID, self.clipboard_string))
             self.tn = ToggleName(self.clipboard_string)
