@@ -51,6 +51,7 @@ right   (character={ctrl+f}|
 
 Empty triple quotes = {tab}'""" """';
 Empty method definition = ' (self,):'{ctrl+a}{tab}'def ' ;
+
 #
 ### Toggle name commands
 
