@@ -756,7 +756,7 @@ class bang_name(component_Parent):
             self.data = right    
         else:
             self.data = left + "!!" + right
-        
+b        
         return True
 
 class not_name(component_Parent):
