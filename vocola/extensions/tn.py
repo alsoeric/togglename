@@ -173,6 +173,9 @@ class sqlHandle():
         """Closes sql DB"""
         del self.handle
     
+    def ci_val_lookup(self, key):
+        return self.val_lookup (key)
+    
     def val_lookup(self, key):
         """Returns the value at self.handle[key] or None"""
         self.open()
@@ -192,7 +195,10 @@ class sqlHandle():
         logging.debug("SQL key look up with val |%s|: |%s|" % (search_val, key))
         self.close()
         return key
-    
+
+    def ci_set_match(self,key, value):
+        return self.set_match (key, value)
+
     def set_match(self, key, val):
         """Sets self.handle[key] to val.
         deletes any other key that points to val and returns that key
@@ -603,7 +609,7 @@ class ToggleName():
                 #self.nest_token(token)
                 previous_token.data = previous_token.data.rpartition(valid_name)[0].strip()
                 #remove the "::"
-                self.remainingdata = self.remainingdata[2b:]
+                self.remainingdata = self.remainingdata[2:]
                 return token
         
         
@@ -646,7 +652,7 @@ class string_name(component_Parent):
         looks up sql database for partering codename, if none,
         returns bang_name"""
         sql = sqlHandle()
-        val = sql.val_lookup(self.data)
+        val = sql.val_lookup(self.data.lower())
         
         if val == None:
             self.__class__ =  bang_name
@@ -711,10 +717,11 @@ class bang_name(component_Parent):
                 
         else:
             conflict = sql.set_match(str_name, cod_name)
-
         
         self.__class__ = end_type
         self.__init__(goal_name, had_cursor = self.had_cursor)
+        #conflict = sql.ci_set_match(str_name, cod_name)
+        #return end_type(goal_name, had_cursor = self.had_cursor)
 
         
     
@@ -756,7 +763,6 @@ class bang_name(component_Parent):
             self.data = right    
         else:
             self.data = left + "!!" + right
-b        
         return True
 
 class not_name(component_Parent):
