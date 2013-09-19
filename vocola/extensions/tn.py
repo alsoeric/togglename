@@ -110,6 +110,7 @@ new method:count backwards arg list:up to:
 """
 import logging
 import sqlite3dbm
+import re
 
 
 logging.basicConfig(filename='./toggle_name.log',
@@ -321,7 +322,7 @@ class ToggleName():
                      self.q_not_Name, #looks for punkucations + whitespace + comments + quotes
                      self.q_bang_name, #handles floating !!'s
                      self.q_stringname,
-                     self.q_codename,
+                     self.q_codename,          
                     ]
 
         previous_token = None
@@ -374,6 +375,60 @@ class ToggleName():
     def count(self, component):
         """increments the compnent types count by 1 in self.component_count"""
         self.component_count[component.__class__] = self.component_count.get(component.__class__, 0) + 1
+
+    @staticmethod
+    def white_space(string):
+        """Returns length of whitespace type in the start of the string"""
+        length = 0
+        for character in string:
+           if character.isspace():
+                length += 1
+           else: break
+        return length
+        
+
+    @staticmethod            
+    def punk(string):
+        """returns the lenght of puncuation at the beggining of str"""
+        length = 0
+        for index, char in enumerate(string):
+            if char.isalnum() or char in ("_", CURSOR_MARKER, "#", "'", '"', '"""') or char.isspace():
+                break
+            
+            if string[index:].startswith("!!"):
+                break
+                
+            length += 1
+        return length
+    @staticmethod        
+    def quote_string(string):
+        """Returns the lenght of quoteString at the begginging of str"""
+        
+        qs = ('"""', "'", '"')
+        q = None
+        for quote in qs:
+            if string.startswith(quote):
+                q = quote
+                break
+        if q == None: return 0
+        #~ logging.debug("NN qs dectected|%s|"%string)
+        index = len(q)
+        end_index = len(string)
+        while end_index > index:
+            if string[index:].startswith(q):
+                return index+len(q) 
+            index += 1
+        return end_index
+    @staticmethod        
+    def hash_comment(string):
+        """Returns the lenght of the comment at the beggining of string"""
+        if not string.startswith("#"):
+            return 0
+        nl_index = string.find("\n")
+        if nl_index == -1:
+            return len(string)
+        else:
+            return nl_index
         
     def get_count(self):
         """Returns a tuple of 4 ints. Each int corisponding to the count of component types in the order of nn bn sn cn"""
@@ -395,77 +450,26 @@ class ToggleName():
         #whiteSpace
         #puncuation (not inculding '_' or '\x01' or #)
         #Ignores 
-        
-        def white_space(string):
-            """Returns length of whitespace type in the start of the string"""
-            length = 0
-            for character in string:
-                if character.isspace():
-                    length += 1
-                else: break
-            return length
-            
-
-            
-        def punk(string):
-            """returns the lenght of puncuation at the beggining of str"""
-            length = 0
-            for index, char in enumerate(string):
-                if char.isalnum() or char in ("_", CURSOR_MARKER, "#", "'", '"', '"""') or char.isspace():
-                    break
-                
-                if string[index:].startswith("!!"):
-                    break
-                
-                length += 1
-            return length
-        
-        def quote_string(string):
-            """Returns the lenght of quoteString at the begginging of str"""
-            
-            qs = ('"""', "'", '"')
-            q = None
-            for quote in qs:
-                if string.startswith(quote):
-                    q = quote
-                    break
-            if q == None: return 0
-            #~ logging.debug("NN qs dectected|%s|"%string)
-            index = len(q)
-            end_index = len(string)
-            while end_index > index:
-                if string[index:].startswith(q):
-                    return index+len(q) 
-                index += 1
-            return end_index
-        
-        def hash_comment(string):
-            """Returns the lenght of the comment at the beggining of string"""
-            if not string.startswith("#"):
-                return 0
-            nl_index = string.find("\n")
-            if nl_index == -1:
-                return len(string)
-            else:
-                return nl_index
              
             
-        not_name_test_list = [hash_comment,
-                              white_space,
-                              key_word,
-                              quote_string,
-                              punk,
+        not_name_test_list = [(self.hash_comment, comment_not_name),
+                              (key_word, None),
+                              (self.white_space, w_space_not_name),
+                              (self.quote_string, quote_not_name),
+                              (self.punk, not_name),
                               ]
         
         length = 0
         flag = True
         while flag:
             flag = False
-            for test in not_name_test_list:
+            for test, sub_class in not_name_test_list:
                 l = test(self.remainingdata[length:])
                 if l:
                     length += l
                     flag = True
+                    if test is key_word: #To prevent keywords from eating bonenames
+                        flag = False
                     break
         
         if length == 0:
@@ -476,7 +480,15 @@ class ToggleName():
         return not_Name_obj
     
     
-    
+    def q_key_name(self):
+        #(key_word, key_name),
+        l = key_word(self.remainingdata)
+        if l:
+            key = key_name(self.remainingdata[l:])
+            self.remainingdata = self.remainingdata[l:]
+            return key
+        else:
+            return None
     
     def q_codename(self):
         """Returns codename componendt from the front of self.remaining data
@@ -588,31 +600,102 @@ class ToggleName():
         also updates self.remainingdata
 
         will not nest the colon name, only detect.
+        
+        All bonenames must be two words seperated by whitespace
         """
         token = None
+        previous_token = None
+        before_last_token = None
+        space_token = None
+        bn_string = ""
+        re_pattern = r"[a-zA-Z0-9]* [a-zA-Z0-9]*$"
+        
         if not self.remainingdata.startswith("::"):
             return token
         #Possible chance for bone name.
+        #work backwards untill two 'words' are captured.
+        #if a stringname is first, then it is insured that
+        #we will have >= 2 words
+        previous_token = self.nesting_stack[-1][-1]
+        if isinstance(previous_token, string_name):
+            bn_string = re.search(re_pattern, previous_token.data)
+            if bn_string is not None:
+                bn_string = bn_string.group()
 
-        #inspect data of last token, to see if it is indeed a valid Bone-name
-        try:
-            previous_token = self.nesting_stack[-1][-1] #is there a chance that a closed nesting group would cause bugs? :\
-        except IndexError:
-            previous_token = None
-        
-        if not isinstance(previous_token, (string_name, code_name, not_name)):
+        elif isinstance(previous_token, (code_name, pass_name)):
+            #work backwards untill two words are grabbed,
+            before_last_token = self.nesting_stack[-1][-2]
+            if before_last_token.data == " ":
+                space_token = before_last_token #returns None
+                before_last_token = self.nesting_stack[-1][-3]
+                string = " ".join([before_last_token.data,
+                               previous_token.data],)
+            else:
+                string = "".join([before_last_token.data,
+                               previous_token.data],)
+            logging.debug("QBN looking at |%s|"%string)
+            bn_string = re.search(re_pattern, string)
+            
+            if bn_string is None:
+                print("ffuuu")
+                return None
+            bn_string = bn_string.group()
+            
+            
+                
+        token = Bone_Name.new(bn_string)
+        if token is None:
             return token
-        for valid_name in Bone_Name.get_valid_names():
-            if previous_token.data.endswith(valid_name):
-                token = Bone_Name.new(valid_name)
-                #nesting it sould be done at a differnt level
-                #self.nest_token(token)
-                previous_token.data = previous_token.data.rpartition(valid_name)[0].strip()
-                #remove the "::"
-                self.remainingdata = self.remainingdata[2:]
-                return token
         
+        elif before_last_token is None: 
+            croped_data = previous_token.data.rpartition(bn_string)[0]
+            logging.debug("QBN BLTisNone remaining data: |%s|"%croped_data)
+            if not croped_data == "":
+                previous_token.data = croped_data
+            else:
+                previous_token.convert_to_nullname()
+            
+        else:
+            #datas = [before_last_token.data + " ", previous_token.data]
+            #datas = self._crop_strings(datas, bn_string)
+            #logging.debug("QBN croped_string: |%s|"%datas)
+            previous_token.convert_to_nullname()
+            if space_token is not None:
+                space_token.convert_to_nullname()
+            cropedd_string = before_last_token.data[:len(previous_token.data) - len(bn_string)]
+            if cropedd_string == "":
+                before_last_token.convert_to_nullname()
+            else:
+                before_last_token.data = cropedd_string
+#datas[0]
+    
+        #remove the "::"
+        self.remainingdata = self.remainingdata[2:]
+        return token
         
+    @staticmethod
+    def _crop_strings(list_of_strings, search_string):
+        """returns a edited version of arg1
+        crop off as much of search_string that
+        exists at the end of each string. also cropping search_string""" 
+        result_strings = []
+        for s in list_of_strings:
+            print(s)
+            for i in range(len(search_string),0,-1):
+                print(i, search_string[:i], s.endswith(search_string[:i]))
+                if s.endswith(search_string[:i]):
+                    search_string = search_string[i:]
+                    result_strings.append(s[:-i])
+                    print("FAFSAF")
+                    break
+            else:
+                result_strings.append(s[-i:])
+        return result_strings
+                
+
+                    
+        
+
 class component_Parent(object):
     
     def __str__(self,):
@@ -645,6 +728,9 @@ class component_Parent(object):
     
     def convert_to_nullname(self):
         self.__class__ = null_name
+
+    def convert_to_passname(self):
+        self.__class__ = pass_name
         
 class string_name(component_Parent):
     def convert(self):
@@ -768,12 +854,28 @@ class bang_name(component_Parent):
 class not_name(component_Parent):
     pass
 
+class key_name(component_Parent):
+    pass
+
+class quote_not_name(component_Parent):
+    pass
+
+class comment_not_name(component_Parent):
+    pass
+
+class w_space_not_name(component_Parent):
+    pass
+
 class null_name(component_Parent):
     """A null name,
     if a token is converted to this class, will essentally be deleted
     """
     def present(self):
         return ""
+
+class pass_name(component_Parent):
+    def convert(self):
+        return
 
 class Bone_Name(component_Parent):
     """
@@ -840,6 +942,12 @@ class Bone_Name(component_Parent):
             if self.trigger in token.data:
                 return True
         return False
+
+    def work_with(self, token):
+        """Abastract method,
+        If a bonename must directly edit a token that is inside itself. But does not nessassarrly have anything to do with it's trigger
+        """
+        return
             
 
 class Arg_list(Bone_Name):
@@ -862,5 +970,31 @@ class Quoted_tripple(Bone_Name):
         if isinstance(token, Quoted_tripple):
             token.convert_to_nullname()
             return True
-        token.convert_to_notname()
+        token.convert_to_passname()
         return False
+
+class Open_With(Bone_Name):
+    """ open with:: "foo.txt" as foo
+    ->  with open("foo.txt") as foo:
+    oop:
+        get the presented form of inards: | "foo.txt" as foo|
+        rsplit(" as ",1)
+      """
+    def __init__(self):
+        Bone_Name.__init__(self)
+        self.set_bones("with open(",
+                       ":")
+    
+    def present(self):
+        
+        contence = "".join([t.present() for t in self.nesting_list])
+        contence = contence.rsplit(" as ", 1)
+        #contence = [s.strip() for s in contence]
+        logging.debug("WOP present |%s|"%contence)
+        result = self.prefix + ") as ".join(contence)
+        if not result.endswith(":\n") or result.endswith(":") :
+            result += ":"
+        return result
+
+class With_Open(Open_With, Bone_Name):
+    pass
