@@ -1,113 +1,113 @@
-"""process
-    get region
-    Once we have region, fragment into components, one component at a time.
-    components are:
-        stringname
-        codename
-        bangbangname
-        notname #garbange can, whitespace, codelitmeter + blah 
+# """process
+    # get region
+    # Once we have region, fragment into components, one component at a time.
+    # components are:
+        # stringname
+        # codename
+        # bangbangname
+        # notname #garbange can, whitespace, codelitmeter + blah 
         
         
         
         
-    predicats are :
-        (is stringname) and (not cursor needed )and (string_to_code)
-        (is stringname )and (cursor needed) and (string_to_code)
+    # predicats are :
+        # (is stringname) and (not cursor needed )and (string_to_code)
+        # (is stringname )and (cursor needed) and (string_to_code)
         
-        (is codename )and (not cursor needed) and (not string_to_code)
-        (is codename )and (cursor needed) and (not string_to_string)
+        # (is codename )and (not cursor needed) and (not string_to_code)
+        # (is codename )and (cursor needed) and (not string_to_string)
 
 
-----------------------------
+# ----------------------------
 
-Toggle Box: Programing by speach
-A collection of editor tools for easy to dictate and read code formaters.
+# Toggle Box: Programing by speach
+# A collection of editor tools for easy to dictate and read code formaters.
 
 
-The fundimental problem that arises when dictating code is syntaxs.
-It is slow and annoying to dictate every open_square_bracket close_square_bracket
-every under_score and every exclamation point equals.
+# The fundimental problem that arises when dictating code is syntaxs.
+# It is slow and annoying to dictate every open_square_bracket close_square_bracket
+# every under_score and every exclamation point equals.
 
-This coupled with the problems that dictation software has with English syntaxs,
-such as capatlasation and using spaces in between words rather then underscores;
-makes coding by speach a complex time consuming task.
+# This coupled with the problems that dictation software has with English syntaxs,
+# such as capatlasation and using spaces in between words rather then underscores;
+# makes coding by speach a complex time consuming task.
 
-Toggle Box is the solution.
+# Toggle Box is the solution.
 
-String-names solve the problem of having dictated variables.
+# String-names solve the problem of having dictated variables.
 
-A string-name is, simply, an illgal variable name that is in plain english such as:
-    a long river
-    input stack
-    parrent node
-    temp value
-    error flag
-These would normaly throw an error when being assigned to. 
-When coding we tend to use the same variable names more then one time, and in more
-then one scope or project. So we pair each string-name to a code-name. A python legal 
-variable name, such as:
-    aLongRiver
-    input_stack
-    parrentNode
-    tmpvar
-    ERROR_FLAG
+# A string-name is, simply, an illgal variable name that is in plain english such as:
+    # a long river
+    # input stack
+    # parrent node
+    # temp value
+    # error flag
+# These would normaly throw an error when being assigned to. 
+# When coding we tend to use the same variable names more then one time, and in more
+# then one scope or project. So we pair each string-name to a code-name. A python legal 
+# variable name, such as:
+    # aLongRiver
+    # input_stack
+    # parrentNode
+    # tmpvar
+    # ERROR_FLAG
 
-After dictating the code, simply call Toggle Box's apropriate command and all string-name
-will automaticly converted into code-name.
+# After dictating the code, simply call Toggle Box's apropriate command and all string-name
+# will automaticly converted into code-name.
 
-Here is an example of pre toggle and post toggle code:
+# Here is an example of pre toggle and post toggle code:
 
-class Train():
-    def __init__(self):
-        self.is moveing = True
+# class Train():
+    # def __init__(self):
+        # self.is moveing = True
 
-    def running():
-        while self.is moving:
-            self.blow horn()
-            if distance to next city < self.stopping distance:
-                self.slow down()
+    # def running():
+        # while self.is moving:
+            # self.blow horn()
+            # if distance to next city < self.stopping distance:
+                # self.slow down()
 
-class Train():
-    def __init__(self):
-        self.is_moveing = True
+# class Train():
+    # def __init__(self):
+        # self.is_moveing = True
 
-    def running():
-        while self.is_moving:
-            self.blow_horn()
-            if cityDist < self.stopDist:
-                self.reduseSpeed()
+    # def running():
+        # while self.is_moving:
+            # self.blow_horn()
+            # if cityDist < self.stopDist:
+                # self.reduseSpeed()
 
-If however a string-name does not have a pair mached to it, it will be suffixed by "!!unknown"
-when this happens, one of ToggleBox's fix commands should be called, that will repalce the "unknown"
-with the curser, for quick typing of the desired code-name. Then Fix Next should be called,
-all following accurances of the string-name will be replaced by the newly matched code-name.
+# If however a string-name does not have a pair mached to it, it will be suffixed by "!!unknown"
+# when this happens, one of ToggleBox's fix commands should be called, that will repalce the "unknown"
+# with the curser, for quick typing of the desired code-name. Then Fix Next should be called,
+# all following accurances of the string-name will be replaced by the newly matched code-name.
 
-There are also methods avalble to revert code-names back into string-name, and match code-names to string-names.
+# There are also methods avalble to revert code-names back into string-name, and match code-names to string-names.
 
------------------------------------------------
+# -----------------------------------------------
 
-Sceloton commands and bone-names.
-Quck generation of symbol heavy syntaxs.
+# Sceloton commands and bone-names.
+# Quck generation of symbol heavy syntaxs.
 
-Another problem that accurs when dictating code are symbol syntaxs.
+# Another problem that accurs when dictating code are symbol syntaxs.
 
-Skeloton commands generate the empty shell of a regular coding pattern such as deffining new methods. 
-Using that example the 'new method' skellton command would generate:
+# Skeloton commands generate the empty shell of a regular coding pattern such as deffining new methods. 
+# Using that example the 'new method' skellton command would generate:
 
           
-new method:count backwards arg list:up to:
-    for count in range arg list:0, up to, -1:
-        print count
+# new method:count backwards arg list:up to:
+    # for count in range arg list:0, up to, -1:
+        # print count
 
-new method:count backwards arg list:up to:
-    while up to > 0:
-        print up to
-        up to += 1
-
-
+# new method:count backwards arg list:up to:
+    # while up to > 0:
+        # print up to
+        # up to += 1
 
 
-"""
+
+
+# """
 import logging
 import sqlite3dbm
 import re
