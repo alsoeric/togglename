@@ -99,6 +99,8 @@ test_set = [
 
     return great big some
 """,1,0,""),
+
+                ("foo::arg list: foo, bar", 1,1, ""),
                 ]
                 
                 

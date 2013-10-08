@@ -322,7 +322,7 @@ class ToggleName():
                      self.q_not_Name, #looks for punkucations + whitespace + comments + quotes
                      self.q_bang_name, #handles floating !!'s
                      self.q_stringname,
-                     self.q_codename,          
+                     self.q_codename,
                     ]
 
         previous_token = None
@@ -338,14 +338,9 @@ class ToggleName():
                     else:
                         self.add_token(token)
                     self.count(token)
-                    if previous_token is None:
-                        previous_token, token = token, None
-                        break
-                    yield previous_token
-                    previous_token, token = token, None
+                    yield token
                     break
-        yield previous_token
-                    
+                            
         return
 
     def token_is_nesting_closeur_trigger(self, token):
@@ -456,26 +451,20 @@ class ToggleName():
                               (key_word, None),
                               (self.white_space, w_space_not_name),
                               (self.quote_string, quote_not_name),
-                              (self.punk, not_name),
+                              (self.punk, punk_not_name),
                               ]
         
         length = 0
-        flag = True
-        while flag:
-            flag = False
-            for test, sub_class in not_name_test_list:
-                l = test(self.remainingdata[length:])
-                if l:
-                    length += l
-                    flag = True
-                    if test is key_word: #To prevent keywords from eating bonenames
-                        flag = False
-                    break
+        for test, sub_class in not_name_test_list:
+            l = test(self.remainingdata[length:])
+            if l:
+                length += l
+                break
         
         if length == 0:
             return None        
         
-        not_Name_obj = not_name(self.remainingdata[:length])
+        not_Name_obj = sub_class(self.remainingdata[:length])
         self.remainingdata = self.remainingdata[length:]
         return not_Name_obj
     
@@ -489,6 +478,7 @@ class ToggleName():
             return key
         else:
             return None
+        
     
     def q_codename(self):
         """Returns codename componendt from the front of self.remaining data
@@ -600,77 +590,27 @@ class ToggleName():
         also updates self.remainingdata
 
         will not nest the colon name, only detect.
-        
-        All bonenames must be two words seperated by whitespace
+        Bone name form is ::bone name:
+                
         """
         token = None
-        previous_token = None
-        before_last_token = None
-        space_token = None
-        bn_string = ""
-        re_pattern = r"[a-zA-Z0-9]* [a-zA-Z0-9]*$"
+        re_pattern = r"(^::([a-zA-Z0-9]* ?){2}:)"
+        #re_pattern = r"^::[a-zA-Z0-9]* [a-zA-Z0-9]*"
         
         if not self.remainingdata.startswith("::"):
             return token
         #Possible chance for bone name.
-        #work backwards untill two 'words' are captured.
-        #if a stringname is first, then it is insured that
-        #we will have >= 2 words
-        previous_token = self.nesting_stack[-1][-1]
-        if isinstance(previous_token, string_name):
-            bn_string = re.search(re_pattern, previous_token.data)
-            if bn_string is not None:
-                bn_string = bn_string.group()
-
-        elif isinstance(previous_token, (code_name, pass_name)):
-            #work backwards untill two words are grabbed,
-            before_last_token = self.nesting_stack[-1][-2]
-            if before_last_token.data == " ":
-                space_token = before_last_token #returns None
-                before_last_token = self.nesting_stack[-1][-3]
-                string = " ".join([before_last_token.data,
-                               previous_token.data],)
-            else:
-                string = "".join([before_last_token.data,
-                               previous_token.data],)
-            logging.debug("QBN looking at |%s|"%string)
-            bn_string = re.search(re_pattern, string)
-            
-            if bn_string is None:
-                print("ffuuu")
-                return None
-            bn_string = bn_string.group()
-            
-            
-                
-        token = Bone_Name.new(bn_string)
+        #look forward & grab the next two words
+        bone_string = re.match(re_pattern, self.remainingdata)
+        if bone_string is None:
+            return token
+        bone_string = bone_string.group() #match obeject -> string
+        
+        token = Bone_Name.new(bone_string.strip(":"))
         if token is None:
             return token
         
-        elif before_last_token is None: 
-            croped_data = previous_token.data.rpartition(bn_string)[0]
-            logging.debug("QBN BLTisNone remaining data: |%s|"%croped_data)
-            if not croped_data == "":
-                previous_token.data = croped_data
-            else:
-                previous_token.convert_to_nullname()
-            
-        else:
-            #datas = [before_last_token.data + " ", previous_token.data]
-            #datas = self._crop_strings(datas, bn_string)
-            #logging.debug("QBN croped_string: |%s|"%datas)
-            previous_token.convert_to_nullname()
-            if space_token is not None:
-                space_token.convert_to_nullname()
-            cropedd_string = before_last_token.data[:len(previous_token.data) - len(bn_string)]
-            if cropedd_string == "":
-                before_last_token.convert_to_nullname()
-            else:
-                before_last_token.data = cropedd_string
-#datas[0]
-    
-        #remove the "::"
-        self.remainingdata = self.remainingdata[2:]
+        self.remainingdata = self.remainingdata[len(bone_string):]
         return token
         
     @staticmethod
@@ -854,16 +794,19 @@ class bang_name(component_Parent):
 class not_name(component_Parent):
     pass
 
-class key_name(component_Parent):
+class key_name(not_name):
     pass
 
-class quote_not_name(component_Parent):
+class quote_not_name(not_name):
     pass
 
-class comment_not_name(component_Parent):
+class comment_not_name(not_name):
     pass
 
-class w_space_not_name(component_Parent):
+class w_space_not_name(not_name):
+    pass
+
+class punk_not_name(not_name):
     pass
 
 class null_name(component_Parent):
@@ -882,7 +825,7 @@ class Bone_Name(component_Parent):
     """
 
     def __init__(self,):
-        component_Parent.__init__(self, self.__class__.__name__.lower().replace("_", " ",) + "::")
+        component_Parent.__init__(self,"::" + self.__class__.__name__.lower().replace("_", " ",) + ":")
         self.nesting_list = []
         self.prefix = ""
         self.suffix = ""
@@ -938,8 +881,12 @@ class Bone_Name(component_Parent):
         return "".join(val)
 
     def is_closing_trigger(self, token):
-        if isinstance(token, not_name):
+        if isinstance(token, w_space_not_name):
             if self.trigger in token.data:
+                return True
+        if isinstance(token, punk_not_name):
+            if ":::" in token.data:
+                token.data = token.data.replace(":::", "")
                 return True
         return False
 
