@@ -317,15 +317,26 @@ class ToggleName():
     
     def component(self):
         """convert data into indiviual data types"""
-                
-        test_list = [self.q_bone_name, # looks for Bone-names, must be done before q_not_Name
-                     self.q_not_Name, #looks for punkucations + whitespace + comments + quotes
+
+        #todo: Change self.q_foo_bar to point at token class 
+        #if we return to the begining of the list if any of the tokens are found we should be able to have name-tokens that begin with punkucation
+
+        #possible idea to get rid of the punk_name. Garbange can class. 
+        #
+        token_list = [self.q_bone_name, # looks for Bone-names, must be done before q_not_Name
+                    #question_name, #Not implemented yet
+                    #self.q_not_Name, #looks for punkucations + whitespace + comments + quotes
+                     comment_not_name,
+                     key_word,
+                     w_space_not_name,
+                     quote_not_name,
+                     punk_not_name,
+        
                      self.q_bang_name, #handles floating !!'s
                      self.q_stringname,
                      self.q_codename,
                     ]
 
-        previous_token = None
         while self.remainingdata:
             for i in test_list:
                 token = i()
@@ -371,59 +382,9 @@ class ToggleName():
         """increments the compnent types count by 1 in self.component_count"""
         self.component_count[component.__class__] = self.component_count.get(component.__class__, 0) + 1
 
-    @staticmethod
-    def white_space(string):
-        """Returns length of whitespace type in the start of the string"""
-        length = 0
-        for character in string:
-           if character.isspace():
-                length += 1
-           else: break
-        return length
         
 
-    @staticmethod            
-    def punk(string):
-        """returns the lenght of puncuation at the beggining of str"""
-        length = 0
-        for index, char in enumerate(string):
-            if char.isalnum() or char in ("_", CURSOR_MARKER, "#", "'", '"', '"""') or char.isspace():
-                break
-            
-            if string[index:].startswith("!!"):
-                break
-                
-            length += 1
-        return length
-    @staticmethod        
-    def quote_string(string):
-        """Returns the lenght of quoteString at the begginging of str"""
-        
-        qs = ('"""', "'", '"')
-        q = None
-        for quote in qs:
-            if string.startswith(quote):
-                q = quote
-                break
-        if q == None: return 0
-        #~ logging.debug("NN qs dectected|%s|"%string)
-        index = len(q)
-        end_index = len(string)
-        while end_index > index:
-            if string[index:].startswith(q):
-                return index+len(q) 
-            index += 1
-        return end_index
-    @staticmethod        
-    def hash_comment(string):
-        """Returns the lenght of the comment at the beggining of string"""
-        if not string.startswith("#"):
-            return 0
-        nl_index = string.find("\n")
-        if nl_index == -1:
-            return len(string)
-        else:
-            return nl_index
+
         
     def get_count(self):
         """Returns a tuple of 4 ints. Each int corisponding to the count of component types in the order of nn bn sn cn"""
@@ -469,16 +430,6 @@ class ToggleName():
         return not_Name_obj
     
     
-    def q_key_name(self):
-        #(key_word, key_name),
-        l = key_word(self.remainingdata)
-        if l:
-            key = key_name(self.remainingdata[l:])
-            self.remainingdata = self.remainingdata[l:]
-            return key
-        else:
-            return None
-        
     
     def q_codename(self):
         """Returns codename componendt from the front of self.remaining data
@@ -500,31 +451,6 @@ class ToggleName():
         
         return code_name(data)
         
-    def q_bang_name(self, start_index=0):
-        """Returns bangobject
-        is used in q_stringname and q_codename
-        also in compontent tests
-
-        looks for !!codename at self.remainingdata[index:]
-        start_index = int # place in self.remaining data that is looked at
-        """
-        if self.remainingdata[start_index:].startswith("!!"):
-            bang_offset = 2 
-            
-        elif self.remainingdata[start_index:].startswith("!"+CURSOR_MARKER+"!"):
-            bang_offset = 3
-        else:
-            return 0
-            
-        pre_bang_str = self.remainingdata[:start_index + bang_offset]
-        self.remainingdata = self.remainingdata[start_index + bang_offset:]
-        
-        post_bang_data = self.q_codename()#Calls q_codename to capture whateever is after the !!
-        if post_bang_data is None: #will only happen if for some reason a !! is followed by nothing.
-            post_bang_string = "" #Should this be a "unknown"?
-        else:
-            post_bang_string = post_bang_data.present()
-        return bang_name(pre_bang_str + post_bang_string)
     
     
     def q_stringname(self):
@@ -584,34 +510,6 @@ class ToggleName():
         
         return sn
                 
-    def q_bone_name(self):
-        """
-        returns a bone-name token, if self.remaining_data starts with a vaild bone_name, else returns None
-        also updates self.remainingdata
-
-        will not nest the colon name, only detect.
-        Bone name form is ::bone name:
-                
-        """
-        token = None
-        re_pattern = r"(^::([a-zA-Z0-9]* ?){2}:)"
-        #re_pattern = r"^::[a-zA-Z0-9]* [a-zA-Z0-9]*"
-        
-        if not self.remainingdata.startswith("::"):
-            return token
-        #Possible chance for bone name.
-        #look forward & grab the next two words
-        bone_string = re.match(re_pattern, self.remainingdata)
-        if bone_string is None:
-            return token
-        bone_string = bone_string.group() #match obeject -> string
-        
-        token = Bone_Name.new(bone_string.strip(":"))
-        if token is None:
-            return token
-        
-        self.remainingdata = self.remainingdata[len(bone_string):]
-        return token
         
     @staticmethod
     def _crop_strings(list_of_strings, search_string):
@@ -790,24 +688,150 @@ class bang_name(component_Parent):
         else:
             self.data = left + "!!" + right
         return True
+    @staticmethod
+    def str_len(string, start_index=0):
+        """Returns a tuble of  (length of bangname, remaining string)  
+        
+        is used in stringname.q and q_codename.q
+        also in compontent tests
+
+        looks for !!codename at self.remainingdata[index:]
+        start_index = int # place in self.remaining data that is looked at
+        """
+        if self.remainingdata[start_index:].startswith("!!"):
+            bang_offset = 2 
+            
+        elif self.remainingdata[start_index:].startswith("!"+CURSOR_MARKER+"!"):
+            bang_offset = 3
+        else:
+            return 0, string
+            
+        pre_bang_str = self.remainingdata[:start_index + bang_offset]
+        self.remainingdata = self.remainingdata[start_index + bang_offset:]
+        
+        post_bang_data = self.q_codename()#Calls q_codename to capture whateever is after the !!
+        if post_bang_data is None: #will only happen if for some reason a !! is followed by nothing.
+            post_bang_string = "" #Should this be a "unknown"?
+        else:
+            post_bang_string = post_bang_data.present()
+        return bang_name(pre_bang_str + post_bang_string)
+
 
 class not_name(component_Parent):
     pass
 
 class key_name(not_name):
-    pass
+    @staticmethod
+    def str_len(string):
+        """Returns length of whitespace type in the start of the string
+        is looking at the global function keyword that has a list of all language keywords"""
+        l = key_word(self.remainingdata)
+        return l
+
+    @staticmethod
+    def tokenize(string):
+        "returns a tuple of the token or none & the remaining string"
+        l = key_name.str_len(string)
+        if l == 0:
+            return (None, string) 
+        else:
+            return (key_name(string[:l]), string[l:])
 
 class quote_not_name(not_name):
-    pass
+    @staticmethod        
+    def str_len(string):
+        """Returns the lenght of quoteString at the begginging of str"""
+        
+        qs = ('"""', "'", '"')
+        q = None
+        for quote in qs:
+            if string.startswith(quote):
+                q = quote
+                break
+        if q == None: return 0
+        #~ logging.debug("NN qs dectected|%s|"%string)
+        index = len(q)
+        end_index = len(string)
+        while end_index > index:
+            if string[index:].startswith(q):
+                return index+len(q) 
+            index += 1
+        return end_index
+
+    @staticmethod
+    def tokenize(string):
+        "returns a tuple of the token or none & the remaining string"
+        l = quote_not_name.str_len(string)
+        if l == 0:
+            return (None, string) 
+        else:
+            return (quote_not_name(string[:l]), string[l:])
+
 
 class comment_not_name(not_name):
-    pass
+    @staticmethod        
+    def hash_comment(string):
+        """Returns the lenght of the comment at the beggining of string"""
+        #RE pattern ~"$#.*\n"
+        if not string.startswith("#"):
+            return 0
+        nl_index = string.find("\n")
+        if nl_index == -1:
+            return len(string)
+        else:
+            return nl_index
+    @staticmethod
+    def tokenize(string):
+        "returns a tuple of the token or none & the remaining string"
+        l = comment_not_name.str_len(string)
+        if l == 0:
+            return (None, string) 
+        else:
+            return (comment_not_name(string[:l]), string[l:])
 
 class w_space_not_name(not_name):
-    pass
+    @staticmethod
+    def str_len(string):
+        """Returns length of whitespace type in the start of the string"""
+        #RE pattern ~ "($/d)" #start of string, is whitespace
+        length = 0
+        for character in string:
+           if character.isspace():
+                length += 1
+           else: break
+        return length
+    @staticmethod
+    def tokenize(string):
+        "returns a tuple of the token or none & the remaining string"
+        l = w_space_not_name.str_len(string)
+        if l == 0:
+            return (None, string) 
+        else:
+            return (w_space_not_name(string[:l]), string[l:])
 
 class punk_not_name(not_name):
-    pass
+    @staticmethod            
+    def str_len(string):
+        """returns the lenght of puncuation at the beggining of str"""
+        length = 0
+        for index, char in enumerate(string):
+            if char.isalnum() or char in ("_", CURSOR_MARKER, "#", "'", '"', '"""') or char.isspace():
+                break
+            
+            if string[index:].startswith("!!"):
+                break
+                
+            length += 1
+        return lengthpass
+
+    @staticmethod
+    def tokenize(string):
+        "returns a tuple of the token or none & the remaining string"
+        l = punk_not_name.str_len(string)
+        if l == 0:
+            return (None, string) 
+        else:
+            return (punk_not_name(string[:l]), string[l:])
 
 class null_name(component_Parent):
     """A null name,
@@ -817,6 +841,7 @@ class null_name(component_Parent):
         return ""
 
 class pass_name(component_Parent):
+    "A pass name is a token that is static and will not convert into other tokens"
     def convert(self):
         return
 
@@ -837,9 +862,38 @@ class Bone_Name(component_Parent):
                                 # subclasses should use this 
                                 # method to asign what it formats
                                 # (prefix, sufix)
-    @staticmethod    
-    def get_valid_names():
+    @staticmethod
+    def tokenize(string):
+        """
+        returns a bone-name token, if self.remaining_data starts with a vaild bone_name, else returns None
+        also updates self.remainingdata
+
+        will not nest the colon name, only detect.
+        Bone name form is ::bone name:
+                
+        """
+        token = None
+        re_pattern = r"(^::([a-zA-Z0-9]* ?){2}:)"
+        #re_pattern = r"^::[a-zA-Z0-9]* [a-zA-Z0-9]*"
         
+        if not self.remainingdata.startswith("::"):
+            return token, string
+        #Possible chance for bone name.
+        #look forward & grab the next two words
+        bone_string = re.match(re_pattern, string)
+        if bone_string is None:
+            return token, string
+        bone_string = bone_string.group() #match obeject -> string
+        
+        token = Bone_Name.new(bone_string.strip(":"))
+        if token is None:
+            return token, string
+        
+        return token, self.remainingdata[len(bone_string):]
+
+
+    @staticmethod    
+    def get_valid_names():        
         valid_names = {sub_class.__name__.lower().replace("_", " "):sub_class for sub_class in Bone_Name.__subclasses__()}
         #valid_names = {"arg list": ""}
         return valid_names
@@ -897,6 +951,7 @@ class Bone_Name(component_Parent):
         return
             
 
+###   Bone Name classes   ###
 class Arg_list(Bone_Name):
     def __init__(self):
         Bone_Name.__init__(self)
