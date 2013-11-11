@@ -147,8 +147,8 @@ for test, s2c, cn, result in test_set:
         print("Correct result: |%s|"%result)
         print("Actual result: |%s|"%tr)
         print("----")
-        for i in tn.get_parsed_data():
-            print("|%s|"%i.data)
+        for i in tn.parsed_tokens:
+            print("|%s|"%i.string)
             print(i.__class__.__name__)
             print("----")
         print("")

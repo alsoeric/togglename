@@ -1,25 +1,6 @@
-"""process
-    get region
-    Once we have region, fragment into components, one component at a time.
-    components are:
-        stringname
-        codename
-        bangbangname
-        notname #garbange can, whitespace, codelitmeter + blah 
-        
-        
-        
-        
-    predicats are :
-        (is stringname) and (not cursor needed )and (string_to_code)
-        (is stringname )and (cursor needed) and (string_to_code)
-        
-        (is codename )and (not cursor needed) and (not string_to_code)
-        (is codename )and (cursor needed) and (not string_to_string)
-        
-"""
 import logging
 import sqlite3dbm
+import re
 
 
 logging.basicConfig(filename='./toggle_name.log',
@@ -32,7 +13,6 @@ logging.debug('------------ start of tn.py run ------------------')
 
 
 toggle_name_DB = "./togglename.sqlite"
-
 
 language_keywords = ['and',
                     'del',
@@ -70,7 +50,14 @@ language_keywords = ['and',
 
 CURSOR_MARKER = "\x01"
 
+
+
 class sqlHandle():
+    """
+    mysqlite3dbm handeler.
+    Used to store stringname-codename pairs.
+    each pair is stored sn:cn & cn:sn to allow for faster reverse search
+    """
     def open(self):
         """Opens sql DB @ self.handle"""
         try:
@@ -83,9 +70,6 @@ class sqlHandle():
         """Closes sql DB"""
         del self.handle
     
-    def ci_val_lookup(self, key):
-        return self.val_lookup (key)
-    
     def val_lookup(self, key):
         """Returns the value at self.handle[key] or None"""
         self.open()
@@ -94,504 +78,328 @@ class sqlHandle():
         self.close()
         return val
     
-    def key_lookup(self, search_val):
-        """Returns the key that returns val in self.handle 
-        asumes that there is only one key that is set to val
-        If no key, returns None""" 
-        self.open()
-        key = next((key  for key, val in self.handle.items() if val == search_val), None)
-        logging.debug("SQL key look up with val |%s|: |%s|" % (search_val, key))
-        self.close()
-        return key
-
-    def ci_set_match(self,key, value):
-        return self.set_match (key, value)
-
     def set_match(self, key, val):
-        """Sets self.handle[key] to val.
-        deletes any other key that points to val and returns that key
-        overwrites self.handle[key]
+        """Sets self.handle[key] to val. & self.handle[val] to key
         """
-        conflict_key = self.key_lookup(val)
         self.open()
-        if conflict_key:
-            self.handle.pop(conflict_key)
         self.handle[key] = val
-        return conflict_key
+        self.handle[val] = key
+        return 
 
     def clear_data(self):
+        "Clears the DB. Use at own risk"
         self.open()
         self.handle.clear()
         self.close()
-    
-    
-def first_word(string):
-    """Returns the string of the first word in the string,
-    end of string is denoted by whitespace, or punk"""
-    word = ""
-    for char in string:
-        if char.isspace() or not char.isalpha() and not char == CURSOR_MARKER:
-            break
-        else:
-            word += char
-    return word
-    
-def key_word(string):
-    """returns lenght of the keyword at the begining of a str"""
-    fw = first_word(string)
-    first_word_sans_curser = fw.replace(CURSOR_MARKER, "")
-    for keyword in language_keywords:
-        if first_word_sans_curser == keyword:
-            return len(fw)
-    return 0
 
 class ToggleName():
-
-    def __init__(self,data):
+    """Toggle Box parser and toggler
+    """
+    def __init__(self, source_string):
+        self.source_string = source_string
+        self.remaining_source = source_string
+        self.cursor_index = source_string.find(CURSOR_MARKER)
+        if self.cursor_index == -1:
+            self.cursor_index = False
+        else:
+            self.remaining_source = source_string.replace(CURSOR_MARKER, "")
+        self.parsed_tokens = []
+        #The list of tokens that are used to tokenize source_string
+        self.token_list = [LanguageKeyWord,
+                           StringName,
+                           CodeName,
+                           BangName,
+                           NotName,]
+        #Stack of nesting
+        self.nesting_stack = [self.parsed_tokens]
         
-        self.data = data
-        self.remainingdata = data
-        
-        
-        self.component_list = []
-        self.component_count = {} 
-    
     def reasemble(self):
-        rs = ""
-        for component in self.component_list:
-            data = component.present()
-            rs += data
-        return rs + self.remainingdata
+        sl = []
+        for token in self.parsed_tokens:
+            sl.append(token.present())
+        return "".join( sl )
 
     def goto_start(self):
-        ToggleName.__init__(self, self.reasemble())
+        ToggleBox.__init__(self, self.reasemble())
         
-    def toggle(self, s2c= True, cn= True ):
-        """Togglename command
-        s2c = string to code. The direction of toggle. Toggle/flip
+    def add_token(self, token):
+        """Adds a token to the list of parsed tokens. 
+            If the token types alow a merge, such as the case with notnames, and stringname!!bangnames,
+            will merge the two tokens rather then adding,
         """
-        
-        #Maybe do a if not bool(self.get_parsed_data()): self.goto_start() ?
-        #I don't think there's a time that we would call toggle twice in the same isntance, but for the furture maybe?
-        
+        if self.get_previous_token().is_compatable(token): 
+            self.get_previous_token().merge(token)
+        else:
+            self.parsed_tokens.append(token)
+    
+    def get_previous_token(self):
+        """ returns the previously parsed token, or dummy token if there have been no tokens parsed yet"""
+        try:
+            return self.parsed_tokens[-1]
+        except IndexError:
+            return Token("") #dummy token
+
+    def parse_tokens(self, cn = False):
+        """ Returns a list of tokens 
+        parses out tokens from source_string using self.token_list
+        if token is a nesting token, append to nesting stack
+        appends parsed tokens to self.parsed_tokens
+        yeilds token
+        """
         cursor_found = False
-        for token in self.component():
-            if cn and token.has_cursor():
-                cursor_found = True
-            
-            if (isinstance(token, string_name) and 
-                s2c == True and
-                cn == cursor_found):
-                token = token.convert()
-                
-            elif (isinstance(token, code_name) and 
-                s2c == False and
-                cn == cursor_found):
-                token = token.convert()
-            
-            elif (isinstance(token, bang_name)and
-                cn == cursor_found):
-                token = token.matchname(s2c)
-            
-            self.component_list.append(token)
-            if cursor_found:
+        while self.remaining_source:
+            for t in self.token_list:
+                #Ask the token if the source_string starts with it's token
+                parsed_token = t.parse_token(self.remaining_source)
+                if parsed_token is not None:
+                    if self.cursor_index is not False:
+                        self.cursor_index -= len(parsed_token)
+                        if self.cursor_index < 0:
+                            parsed_token.has_cursor = True
+                            self.cursor_index = False
+                    #commented out, uncomment when 
+                    #if self.token_is_nesting_closure(parsed_token):
+                    #    self.reduse_nesting()
+                    #if isinstance(parsed_token, NestingToken):
+                    #    self.nest_token
+                    #else:
+                    self.add_token(parsed_token)
+                    self.remaining_source = self.remaining_source[len(parsed_token):]
+                    break
+            if cn and cursor_found:
                 break
-        return 
-            
-        
-    def fix_unknown(self):
-        """works though data, looking for unfilled bangname, apon finding the first one, replacing unknown with cursor
-        
-        cursor should not be in data,
-        does a look to be sure it is not there
-        """
-        
-        if bool(self.get_parsed_data()): #Restart the parsing to the beginning.
-            self.goto_start()
-        
-        self.remainingdata = self.data.replace(CURSOR_MARKER,"")
-        
-        for part in self.component():
-            self.component_list.append(part)
-            if isinstance(part, bang_name):
-                if part.fix_unknown():
-                    break
-        else:
-            self.remainingdata += CURSOR_MARKER
-                    
-        return 
 
-    def get_parsed_data(self):
-        return self.component_list
-    
-    def component(self):
-        """convert data into indiviual data types"""
-                
-        test_list = [self.q_not_Name, #looks for punkucations + whitespace + comments + quotes
-                    self.q_bang_name, #handles floating !!'s
-                    self.q_stringname,
-                    self.q_codename,
-                    ]
-
-
-        while self.remainingdata:
-            for i in test_list:
-                objname = i()
-                if objname:
-                    self.count(objname)
-                    yield objname
-                    break
-                    
-        return
-                
-    def count(self, component):
-        """increments the compnent types count by 1 in self.component_count"""
-        self.component_count[component.__class__] = self.component_count.get(component.__class__, 0) + 1
+        return self.parsed_tokens
         
-    def get_count(self):
-        """Returns a tuple of 4 ints. Each int corisponding to the count of component types in the order of nn bn sn cn"""
-        result = []
-        for type in [not_name,
-                     bang_name,
-                     string_name,
-                     code_name]:
-            result.append(self.component_count.get(type, 0))
-        #~ logging.debug(str(self.component_count))
-        return tuple(result)
-        
-    def q_not_Name(self):
-        """Returns not_name Object and updates self.remaningData
-        otherwise returns None"""
-        #Insepts self.data for n things
-        #Languare keywords
-        #untouchables, (quote strings & comments)
-        #whiteSpace
-        #puncuation (not inculding '_' or '\x01' or #)
-        #Ignores 
-        
-        def white_space(string):
-            """Returns length of whitespace type in the start of the string"""
-            length = 0
-            for character in string:
-                if character.isspace():
-                    length += 1
-                else: break
-            return length
-            
-
-            
-        def punk(string):
-            """returns the lenght of puncuation at the beggining of str"""
-            length = 0
-            for index, char in enumerate(string):
-                if char.isalnum() or char in ("_", CURSOR_MARKER, "#", "'", '"', '"""') or char.isspace():
-                    break
-                
-                if string[index:].startswith("!!"):
-                    break
-                
-                length += 1
-            return length
-        
-        def quote_string(string):
-            """Returns the lenght of quoteString at the begginging of str"""
-            
-            qs = ('"""', "'", '"')
-            q = None
-            for quote in qs:
-                if string.startswith(quote):
-                    q = quote
-                    break
-            if q == None: return 0
-            #~ logging.debug("NN qs dectected|%s|"%string)
-            index = len(q)
-            end_index = len(string)
-            while end_index > index:
-                if string[index:].startswith(q):
-                    return index+len(q) 
-                index += 1
-            return end_index
-        
-        def hash_comment(string):
-            """Returns the lenght of the comment at the beggining of string"""
-            if not string.startswith("#"):
-                return 0
-            nl_index = string.find("\n")
-            if nl_index == -1:
-                return len(string)
-            else:
-                return nl_index
-             
-            
-        not_name_test_list = [hash_comment,
-                              white_space,
-                              key_word,
-                              quote_string,
-                              punk,
-                              ]
-        
-        length = 0
-        flag = True
-        while flag:
-            flag = False
-            for test in not_name_test_list:
-                l = test(self.remainingdata[length:])
-                if l:
-                    length += l
-                    flag = True
-                    break
-        
-        if length == 0:
-            return None        
-        
-        not_Name_obj = not_name(self.remainingdata[:length])
-        self.remainingdata = self.remainingdata[length:]
-        return not_Name_obj
-    
-    
-    
-    
-    def q_codename(self):
-        """Returns codename componendt from the front of self.remaining data
-        assumes that self.reaningdata does NOT start with a keyword"""     
-        length = 0
-        for char in self.remainingdata:
-            if not char.isalnum() and char not in (CURSOR_MARKER, "_"):
+    def fix_unknown(self,):
+        self.goto_start()
+        self.cursor_index = False
+        for token in self.parse_tokens():
+            if isinstance(token, BangName):
+                token.place_cursor()
                 break
-            length += 1
         
-        if length == 0: return None
-                            
-        bn = self.q_bang_name(length)
-        if bn: return bn
-        
-        
-        data = self.remainingdata[:length]
-        self.remainingdata = self.remainingdata[length:]
-        
-        return code_name(data)
-        
-    def q_bang_name(self, start_index=0):
-        """Returns bangobject
-        is used in q_stringname and q_codename
-        also in compontent tests
-
-        looks for !!codename at self.remainingdata[index:]
-        start_index = int # place in self.remaining data that is looked at
+    def toggle(self, s2c = True, cn = True):
+        """Togglename Command.
+        s2c: string2code: bool: spesifies direction of toggleing
+        cn: cursor needed: Will only toggle name containing the cursor
+        Stringname that do not have a pair will be replaced with a bangname
         """
-        if self.remainingdata[start_index:].startswith("!!"):
-            bang_offset = 2 
+        parsed_tokens = self.parse_tokens()
+        for token in parsed_tokens:
+            if cn:
+                if token.has_cursor and isinstance(token, (StringName, CodeName)):
+                    token.toggle()
+                    break
+                elif token.has_cursor and isinstance(token, BangName):
+                    token.match_name(s2c)
+                    token.has_cursor = True
+            elif (isinstance(token, StringName) and 
+                 s2c == True ):
+                token.toggle()
+                
+            elif (isinstance(token, CodeName) and 
+                 s2c == False):
+                token.toggle()
             
-        elif self.remainingdata[start_index:].startswith("!"+CURSOR_MARKER+"!"):
-            bang_offset = 3
-        else:
-            return 0
-            
-        pre_bang_str = self.remainingdata[:start_index + bang_offset]
-        self.remainingdata = self.remainingdata[start_index + bang_offset:]
-        
-        post_bang_data = self.q_codename()#Calls q_codename to capture whateever is after the !!
-        if post_bang_data is None: #will only happen if for some reason a !! is followed by nothing.
-            post_bang_string = "" #Should this be a "unknown"?
-        else:
-            post_bang_string = post_bang_data.present()
-        return bang_name(pre_bang_str + post_bang_string)
-    
-    def q_unknown(self):
-        """returns unknown object"""
+            elif (isinstance(token, BangName)):
+                token.match_name(s2c)
+                
+        return 
+
+
+class Token(object):
+    """Abstract class of a token."""
+    #re
+    re = "" 
+    mergable_token_types = ()
+    def __init__(self, string, has_cursor = False):
+        self.string = string
+        self.has_cursor = has_cursor
         pass
-    
-    def q_stringname(self):
         
-        name_string = ""
-        #~ cursor = False
-        if self.remainingdata[0].isdigit():
+    def __len__(self,):
+        return len(self.string)
+
+    @classmethod
+    def parse_string(cls, string2parse):
+        """Parses a string and returns the portion at the begining that is a valid type of the token. If none, will return empty string."""
+        try:
+            s = re.match(cls.re, string2parse).group()
+        except AttributeError:
+            s = ""
+        return s
+        
+    @classmethod
+    def parse_token(cls, string2parse):
+        token_data = cls.parse_string(string2parse)
+        if token_data:
+            return cls(token_data)
+        else:
             return None
-        for char in self.remainingdata:
-            if char == CURSOR_MARKER:
-                #~ name_string = "\x01" + name_string
-                pass
-                #~ continue
+
+    def is_compatable(self, token):
+        """Returns True if Token is an instance of any tokens in self.mergable_token_types"""
+        return isinstance(token, self.mergable_token_types)
+
+    def merge(self, token):
+        """Abstract method
+        Merge two tokens into one"""
+        raise NotImplementedError()
+        
+
+
+    def present(self):
+        if self.has_cursor:
+            return self.string + CURSOR_MARKER
+        return self.string
+
+
+
+class NestingToken(Token):
+    """Token capable of nesting"""
+    pass
+
+class NullToken(Token):
+    """Token that presents itself with an empty string"""
+    pass
+
+class PassToken(Token):
+    """Token that does not act on any conversion commands"""
+    pass
+    
+class LanguageKeyWord(Token):
+    """reperests language keywords such as if and or as while for"""
+    re = "|".join(language_keywords)
+
+class BangName(Token):
+    re = "!!\w*"
+    
+    def match_name(self, s2c):
+        """looks up the tokens in the sqldb
+        s2c bool: True if converting string to code,"""
+        sn , cn = self.string.split("!!")
+        if "" in (sn, cn): #What's to match? NOTHING!
+            return
+        sql = sqlHandle()
+        if s2c and cn != "unknown":
+            if sn == "unknown":
+                self.__class__ = CodeName
+                self.__init__(cn, self.has_cursor)
+            else:
+                sql.set_match(sn, cn)
+                self.__class__ = CodeName
+                self.__init__(cn, self.has_cursor)
+        elif not s2c and sn != "unknown":
+            if cn == "unknown":
+                self.__class__ = StringName
+                self.__init__(sn, self.has_cursor)
+            else:
+                sql.set_match(sn, cn)
+                self.__class__ = StringName
+                self.__init__(sn, self.has_cursor)
             
-            elif char == " ":
+    def place_cursor(self,):
+        self.has_cursor = True
+    
+    def present(self,):
+        if self.has_cursor:
+            return self.string.replace("unknown", CURSOR_MARKER)
+        else: return self.string
+
+
+class StringName(Token):
+    """Stringname Token
+    Examples: a long river, sick cat, result value, 4 ints, FooBoo Gar dON
+    illegal exambles: return value (keyword), apples (single word), too_long (underscore)
+
+    Methods:
+     convert:
+      looks up string in local sql db for codename pair. If found, converts to codename. If not found, bangname
+    """
+    mergable_token_types = (BangName)
+    
+    def merge(self, token):
+        self.__class__ = BangName
+        self.__init__(self.string + token.string, self.has_cursor or token.has_cursor)
+    
+    @classmethod
+    def parse_string(cls, string2parse):
+        """Returns "" or a string that is a valid stringname at the beginning of string2parse"""
+        name_string = []
+        if not string2parse[0].isalnum(): 
+            return ""
+        for char in string2parse:
+            if char == " ":
                 #if the next char is not alunum or is a keyword
                 #it marks the end of string_word
                 #except in the case where the curser is after a space
                 name_len = len(name_string)
-                next_is_keyword = key_word(self.remainingdata[name_len+1:])
-                next_is_alnum = self.remainingdata[name_len+1].isalnum()
-                next_is_cursor = self.remainingdata[name_len+1] == CURSOR_MARKER
+                remainder = string2parse[name_len+1:]
+                next_is_keyword = LanguageKeyWord.parse_string(remainder) #will capture language keyword or ""
+                try:
+                    next_is_alnum = remainder[0].isalnum()
+                except IndexError:
+                    return ""
                 
-                if next_is_keyword or not next_is_alnum and not next_is_cursor:                
+                if next_is_keyword or not next_is_alnum:
                         break
-                #~ else:
-                    #~ true_string_name = True
-            
             elif not char.isalnum():
+                print "|%s| is not valid part of SN"%char
                 if char == "_":
                     #Bumped into a code_word, remove chars untill " " is hit
-                    name_string = name_string.rsplit(" ", 1)[0]
-                    #Then remove " "
-                    #~ name_string = name_string.rstrip("\x01")
-                    #~ name_string = name_string.rstrip(" ")
-                    
-                    #~ print("|%s|"%name_string)
-
-                    
+                    name_string = "".join(name_string).rsplit(" ", 1)[0]
                 break
-            
-            name_string += char
-        
+
+            name_string.append(char)
+        name_string = "".join(name_string)
         name_string = name_string.rstrip(" ")
         if name_string == "" or " " not in name_string:
-            return None
-        
-        name_len = len(name_string)
-        #bang bang lookup
-        bb = self.q_bang_name(name_len)
-        if bb: return bb
-        
-        #intisigate string_name 
-        sn = string_name(self.remainingdata[:name_len])
-        #update remainingdata
-        self.remainingdata = self.remainingdata[name_len:]
-        
-        return sn
-                
+            return ""
+        return name_string.lower()
 
-        
-class component_Parent():
-    def __init__(self, data, had_cursor = False):
-        if had_cursor == True:
-            self.had_cursor = True
-        elif CURSOR_MARKER in data:
-            self.had_cursor = True
-            data = data.replace(CURSOR_MARKER,"")
+    def toggle(self,):
+        sql = sqlHandle()
+        cn = sql.val_lookup(self.string)
+        if cn is None:
+            self.merge(BangName("!!unknown"))
         else:
-            self.had_cursor = False
-        self.data = data
+            self.__object__ = CodeName
+            self.__init__(cn, self.has_cursor)
+
+class CodeName(Token):
+    re = "\w+"
+    
+    mergable_token_types = (BangName)
+    
+    def merge(self, token):
+        self.__class__ = BangName
+        self.__init__(self.string + token.string, self.has_cursor or token.has_cursor)
+        
+    def toggle(self,):
+        sql = sqlHandle()
+        sn = sql.val_lookup(self.string)
+        if sn is None:
+            self.merge(BangName("unknown!!"))
+        else:
+            self.__object__ = CodeName
+            self.__init__(sn, self.has_cursor)
+            
+class NotName(Token):
+    """Token that reperesents any chars that do not fit into any other tokens"""
+    re = "[^\w]"
+    
+    def __init__(self, string, has_cursor = False):
+        Token.__init__(self, string, has_cursor)
+        self.string = list(string)
+    
+    def is_compatable(self, token):
+        return isinstance(token, NotName)
+    
+    def merge(self, token):
+        self.string += token.string
+        self.has_cursor = self.has_cursor or token.has_cursor
     def present(self):
-        """Returns string form of data
-        it cursor was in data, adds cursor to the of string"""
-        if self.had_cursor:
-            return self.data + CURSOR_MARKER
-        return self.data
-        
-    def has_cursor(self):
-        return self.had_cursor
-        
-class string_name(component_Parent):
-    def convert(self):
-        """returns new code_name or bang_name
-        looks up sql database for partering codename, if none,
-        returns bang_name"""
-        sql = sqlHandle()
-        val = sql.val_lookup(self.data.lower())
-        
-        if val == None:
-            return bang_name(self.data.lower()+"!!unknown", had_cursor = self.had_cursor)
-        else:
-            return code_name(val, had_cursor = self.had_cursor)
-        
-    
-class code_name(component_Parent):
-    def convert(self):
-        """returns new code_name or bang_name
-        looks up sql database for partering codename, if none,
-        returns bang_name"""
-        # store data in dictionary hidden inside an SQLlite database
-        if self.data == CURSOR_MARKER: #This is here because a lone cursor is consiered a codename, however it should no be converted,
-            return self
-        
-        sql = sqlHandle()
-        string_n  = sql.key_lookup(self.data.replace(CURSOR_MARKER, ""))
-        if string_n == None:
-            return bang_name("unknown!!" + self.data, had_cursor = self.had_cursor)
-        else:
-            return string_name(string_n, had_cursor = self.had_cursor)
-    
+        self.string = "".join(self.string)
+        return Token.present(self)
 
-class bang_name(component_Parent):
-    def matchname(self, s2c):
-        """Returns a string_name or code_name if bang_name has been
-        filled out.
-        Otherwise returns a copy of itself."""
-        # store data in dictionary hidden inside an SQLlite database
-        #What happends in the case of "  !!cod_name" ? should do testing
-        str_name , cod_name = self.data.split("!!")
-        str_name = str_name.lower()
-        if "" in (str_name, cod_name):
-            return self
-        
-        sql = sqlHandle()
-        
-        if s2c:
-            end_type = code_name
-            goal_name = cod_name
-            other_name = str_name
-            lookup = sql.val_lookup
-        else:
-            end_type = string_name
-            goal_name = str_name
-            other_name = cod_name
-            lookup = sql.key_lookup
-            
-            
-        if "unknown" == other_name:
-            pass 
-        elif "unknown" == goal_name:
-            #look up if it has been updated
-            goal_name = lookup(other_name)
-            if goal_name is None:
-                return self
-                
-        else:
-            conflict = sql.ci_set_match(str_name, cod_name)
-        return end_type(goal_name, had_cursor = self.had_cursor)
-
-        
-    
-        #This might be more readable. :D
-        #~ if s2c: 
-            #~ if "unknown" == str_name:
-                #~ return code_name(cod_name) # replace with pass?
-            #~ elif "unknown" == cod_name:
-                #~ #look up if it has been updated
-                #~ cod_name = sql.val_lookup(str_name)
-                #~ if cod_name is None:
-                    #~ return self
-                    #~ 
-            #~ else:
-                #~ conflict = sql.set_match(str_name, cod_name)
-            #~ return code_name(cod_name)
-
-    def fix_unknown(self):
-        """used with fixname, to input the cursor where the unknown was
-        foo bar!!unknown    -> foo bar!!cursor
-        unknown!!foo        -> cursor!!foo
-        !!unknown           -> cursor
-        foobar!!            -> foobar!!cursor # This is needed incase someone calls fix_next without entering in a codename
-        
-        returns True if bangname has unknown, and will edit data
-        otherwise returns false
-        """
-        
-        left, right = self.data.split("!!")
-        if "unknown" not in (left, right):
-            return False
-        
-        if right == "unknown":
-            right = CURSOR_MARKER
-        elif left == "unknown" or CURSOR_MARKER:
-            left = CURSOR_MARKER
-        
-        if left == "":
-            self.data = right    
-        else:
-            self.data = left + "!!" + right
-        
-        return True
-class not_name(component_Parent):
-    pass
-    
-    
