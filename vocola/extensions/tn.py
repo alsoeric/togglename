@@ -109,6 +109,8 @@ class ToggleName():
                            StringName,
                            CodeName,
                            BangName,
+                           CommentNotName,
+                           QuoteNotName,
                            NotName,]
         #Stack of nesting
         self.nesting_stack = [self.parsed_tokens]
@@ -154,7 +156,7 @@ class ToggleName():
                 if parsed_token is not None:
                     if self.cursor_index is not False:
                         self.cursor_index -= len(parsed_token)
-                        if self.cursor_index < 0:
+                        if self.cursor_index <= 0:
                             parsed_token.has_cursor = True
                             self.cursor_index = False
                     #commented out, uncomment when 
@@ -254,12 +256,7 @@ class Token(object):
             return self.string + CURSOR_MARKER
         return self.string
 
-
-
-class NestingToken(Token):
-    """Token capable of nesting"""
-    pass
-
+    
 class NullToken(Token):
     """Token that presents itself with an empty string"""
     pass
@@ -270,7 +267,7 @@ class PassToken(Token):
     
 class LanguageKeyWord(Token):
     """reperests language keywords such as if and or as while for"""
-    re = "|".join(language_keywords)
+    re = "("+ "|".join(language_keywords) + ")(?=(?!\w))"
 
 class BangName(Token):
     re = "!!\w*"
@@ -403,3 +400,10 @@ class NotName(Token):
         self.string = "".join(self.string)
         return Token.present(self)
 
+class CommentNotName(NotName):
+    """Token for parsing out comments"""
+    re = "#.*"
+
+class QuoteNotName(NotName):
+    """Token for parsing out comments"""
+    re = '("""(.|\n)*""")|".*"|' + "'.*'"
