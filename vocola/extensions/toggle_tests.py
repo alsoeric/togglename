@@ -58,7 +58,9 @@ test_set = [
                 
                 ("if 'apple pie', print(apple pie)", 1, 0, "if 'apple pie', print(aplpie)"),
                 
+                #Keyword tests
                 ("defnot go", 1 ,0, "defnot_go"),
+                ("DEF apple pie", 1,0, "def aplpie"),
 
                 ("def very simple \x01counter (simple string):",1,1, "def VsmplCntr\x01 (simple string):"),
                 ("not very simple \x01counter = 1234+ simple string",1,1, "not VsmplCntr\x01 = 1234+ simple string"),
