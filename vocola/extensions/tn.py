@@ -226,6 +226,8 @@ class Token(object):
     @classmethod
     def parse_string(cls, string2parse):
         """Parses a string and returns the portion at the begining that is a valid type of the token. If none, will return empty string."""
+        if type(string2parse) != str:
+            raise TypeError("|%s| is not string, can not be parsed"%string2parse)
         try:
             s = re.match(cls.re, string2parse).group()
         except AttributeError:
@@ -267,7 +269,11 @@ class PassToken(Token):
     
 class LanguageKeyWord(Token):
     """reperests language keywords such as if and or as while for"""
-    re = "("+ "|".join(language_keywords) + ")(?=(?!\w))"
+    re = re.compile("("+ "|".join(language_keywords) + ")(?=(?!\w))", re.I)
+    keyword_dict = {keyword.lower() : keyword for keyword in language_keywords}
+    def present(self):
+        self.string = LanguageKeyWord.keyword_dict[self.string.lower()]
+        return Token.present(self,)
 
 class BangName(Token):
     re = "!!\w*"
