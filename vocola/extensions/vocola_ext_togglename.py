@@ -17,7 +17,11 @@ import os
 
 clippy_filename = os.path.expanduser("~/tn_clippy.txt")
 
-user_dir = os.environ['USERPROFILE']
+try:
+    user_dir = os.environ['USERPROFILE']
+except KeyError:
+    user_dir = os.environ["HOME"]
+
 log_path = os.path.abspath(os.path.join(user_dir,'Documents/toggle_name/'))
 log_name = 'toggle_name.log'
 
