@@ -12,6 +12,9 @@ from optparse import OptionParser
 import traceback
 import os
 
+
+
+
 clippy_filename = os.path.expanduser("~/tn_clippy.txt")
 
 user_dir = os.environ['USERPROFILE']
