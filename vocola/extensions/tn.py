@@ -3,7 +3,8 @@ import sqlite3dbm
 import re
 
 
-logging.basicConfig(filename='./toggle_name.log',
+
+logging.basicConfig(filename='./toggl_name.log',
                     level=logging.DEBUG,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 console = logging.StreamHandler()
@@ -12,7 +13,9 @@ logging.getLogger('').addHandler(console)
 logging.debug('------------ start of tn.py run ------------------')
 
 
-toggle_name_DB = "./togglename.sqlite"
+toggle_name_DB = "C:\\Users\\Tonis\\Documents\\toggle_name\\togglename.sqlite"
+
+
 
 language_keywords = ['and',
                     'del',
@@ -122,7 +125,7 @@ class ToggleName():
         return "".join( sl )
 
     def goto_start(self):
-        ToggleBox.__init__(self, self.reasemble())
+        ToggleName.__init__(self, self.reasemble())
         
     def add_token(self, token):
         """Adds a token to the list of parsed tokens. 
@@ -293,6 +296,13 @@ class BangName(Token):
                 sql.set_match(sn, cn)
                 self.__class__ = CodeName
                 self.__init__(cn, self.has_cursor)
+
+        elif s2c and cn in ("unknown", ""):
+            lookup_cn = sql.val_lookup(sn)
+            if lookup_cn is not None:
+                self.__class__ = CodeName
+                self.__init__(lookup_cn, self.has_cursor)
+        
         elif not s2c and sn != "unknown":
             if cn == "unknown":
                 self.__class__ = StringName
@@ -301,6 +311,13 @@ class BangName(Token):
                 sql.set_match(sn, cn)
                 self.__class__ = StringName
                 self.__init__(sn, self.has_cursor)
+
+        elif not s2c and sn in ("unknown", ""):
+            lookup_sn = sql.val_lookup(cn)
+            if lookup_sn is not None:
+                self.__class__ = StringName
+                self.__init__(lookup_sn, self.has_cursor)
+        
             
     def place_cursor(self,):
         self.has_cursor = True

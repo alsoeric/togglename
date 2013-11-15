@@ -281,7 +281,7 @@ def stdin_toggle_name(gs2c=1, gcn=0):
     # write to stdout
     interface.write_stdout()
     return ""
-
+ 
 def stdin_fix_unknown():
     interface = vocola_fix_unknown()
     interface.read_stdin()
