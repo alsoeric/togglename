@@ -170,8 +170,8 @@ class vocola_interface:
 
     def read_stdin(self):
         try:
-            self.stdin_string = sys.stdin_instance.read()
-            logging.debug( "%s stdin result = |%s|" % (self.ID, self.working_string))
+            self.stdin_string = sys.stdin.read()
+            logging.debug( "%s stdin result = |%s|" % (self.ID, self.stdin_string))
             self.tn = ToggleName(self.stdin_string)
         except Exception, error:
             logging.debug( "STDIN:%s %s" %(self.ID, repr(error)))

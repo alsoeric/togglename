@@ -13,14 +13,16 @@
 
 (defun write-clippy ()
   "write last kill ring entry"
-  (with-temp-buffer (yank)(write-region-clippy)))
+  (with-temp-buffer (yank)(write-region-clippy)
+		    )
+  )
 
 (defun read-clippy ()
   ""
   (insert-file-contents 
       "~/tn_clippy.txt"
       )
-)
+  )
 
 (defun use-this-region-pre()
   "follow with toggle-name-post"
@@ -41,13 +43,15 @@
 (defun toggle-name-post () 
   ""
   (read-clippy)  ;;(yank) ;; overwrites active region ??
-  (narrow-to-region    
+  (fancy-narrow-to-region    
     (region-beginning) 
     (region-end)
     )
   ;; search for C-a and stop
-  (search-forward "\C-a")
-  (delete-backward-char 1)
+  (goto-char (point-min))
+  (if (search-forward "\C-a" nil t)
+      (delete-char -1)
+    )
   )
 
 (defun toggle-statement-pre () 
@@ -76,7 +80,7 @@
 
 (defun toggle-post () 
   ""
-   (narrow-to-region    
+   (fancy-narrow-to-region    
     (region-beginning) 
     (region-end)
     )
@@ -90,10 +94,11 @@
   )
 
 (defun fix-cleanup ()
-   ""
-   (read-clippy)   ;; (yank)
-   ;; search forward for cursor marker
-   (beginning-of-buffer)
-   (search-forward "\C-a" nil t)
-   (delete-backward-char 1)		  
-   )
+  "Read from clippy and remove all instances of the \"\C-a\" character."
+  (read-clippy) ;; (yank) 
+  ;; search forward for cursor marker
+  (goto-char (point-min))
+  (if (search-forward "\C-a" nil t)
+      (delete-char -1)
+    )
+  )
