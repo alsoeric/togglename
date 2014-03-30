@@ -132,6 +132,14 @@ toggle (definition|method) = '{esc}:(toggle-def-pre){enter}'
 all done = '{esc}:(fancy-widen){enter}'
 	      ;
 
+fillOther(lchar,rchar) := $rchar{ctrl+x}{ctrl+x}$lchar{ctrl+x}{ctrl+x};
+
+paren that           = fillOther('(',')');
+bracket that         = fillOther('[',']');
+brace that           = fillOther('{','}');
+single [quote]  that = fillOther("'","'");
+double [quote]  that = fillOther('"','"');
+tripple [quote] that = fillOther('"""','"""');
 
 
 ### 
