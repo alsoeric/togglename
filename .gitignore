@@ -1,6 +1,7 @@
 # emacs
 *~
-#*#
+\#*\#
+*log
 
 #################
 ## Eclipse
@@ -12,6 +13,7 @@
 bin/
 tmp/
 *.tmp
+*.stackdump
 *.bak
 *.swp
 *~.nib

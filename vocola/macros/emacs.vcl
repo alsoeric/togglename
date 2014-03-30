@@ -66,70 +66,70 @@ restore mark and point = restoremp();
 #	       (search-forward "\C-a")(delete-backward-char)
 #                ;
 
-(use this|toggle) region = {esc}:"(use-this-region-pre)"{enter}
+(use this|toggle) region = '{esc}:(use-this-region-pre){enter}'
               Wait(0)
               toggle.name(1,0) 
-	      {esc}:"(toggle-post)"{enter}
+	      '{esc}:(toggle-post){enter}'
 	      ;
 
 
-toggle name = {esc}:"(toggle-name-pre)"{enter}
+toggle name = '{esc}:(toggle-name-pre){enter}'
               Wait(0) # wait to flush character queue
               toggle.name(1,1) # string to code, need cursor marker
-	      {esc}:"(toggle-name-post)"{enter}
+	      '{esc}:(toggle-name-post){enter}'
 	      # CLIPSAVE()/CLIPRESTORE()
 	      ;
 
-toggle statement = {esc}:"(toggle-statement-pre)"{enter}
+toggle statement = '{esc}:(toggle-statement-pre){enter}'
               Wait(0)
               toggle.name(1,0)
-	      {esc}:"(toggle-post)"{enter}
+	      '{esc}:(toggle-post){enter}'
 	      # CLIPSAVE()/CLIPRESTORE()
 	      ;
 
-toggle expression = {esc}:"(toggle-expression-pre)"{enter}
+toggle expression = '{esc}:(toggle-expression-pre){enter}'
               Wait(0)
               toggle.name(1,0) 
-	      {esc}:"(toggle-post)"{enter}
+	      '{esc}:(toggle-post){enter}'
 	      # CLIPSAVE()/CLIPRESTORE()
 	      ;
 
-toggle class = {esc}:"(toggle-class-pre)"{enter}
+toggle class = '{esc}:(toggle-class-pre){enter}'
               Wait(0)
               toggle.name(1,0) 
-	      {esc}:"(toggle-post)"{enter}
+	      '{esc}:(toggle-post){enter}'
 	      # CLIPSAVE()/CLIPRESTORE()
 	      ;
 
-toggle (definition|method) = {esc}:"(toggle-def-pre)"{enter}
+toggle (definition|method) = '{esc}:(toggle-def-pre){enter}'
               Wait(0)
               toggle.name(1,0) 
-	      {esc}:"(toggle-post)"{enter}
+	      '{esc}:(toggle-post){enter}'
 	      # CLIPSAVE()/CLIPRESTORE()
 	      ;
 
 
-(fix|fixed) region = {esc}:"(fix-pre)"{enter}
+(fix|fixed) region = '{esc}:(fix-pre){enter}'
               Wait(0)
               # fix names and move to next unknown
               toggle.firstunknown() 
-	      {esc}:"(fix-cleanup)"{enter}
+	      '{esc}:(fix-cleanup){enter}'
 	      ;
 
 # only make on extension call.  region management gets too confusing
-(fix|fixed) next = {esc}:"(fix-pre)"{enter}
+(fix|fixed) next = '{esc}:(fix-pre){enter}'
               Wait(0)
 	      toggle.fix_unknown()
-	      {esc}:"(fix-cleanup)"{enter}
+	      '{esc}:(fix-cleanup){enter}'
 	      ;
 
-(fix|fixed) unknown = {esc}:"(fix-pre)"{enter}
+(fix|fixed) unknown = '{esc}:(fix-pre){enter}'
               Wait(0)
     	      toggle.firstunknown()
-	      {esc}:"(fix-cleanup)"{enter}
+	      '{esc}:(fix-cleanup){enter}'
 	      ;
 
-all done = {esc}xfancy-widen{enter}
+all done = '{esc}:(fancy-widen){enter}'
 	      ;
 
 
